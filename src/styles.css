@@ -1,1 +1,235 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: #f5f7fb;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    color: #0f172a;
+}
+
+/* GLOBAL */
+* {
+    box-sizing: border-box;
+}
+
+/* MAIN CONTAINER */
+.container-dashboard {
+    width: 90%;
+    max-width: 1450px;
+    margin: 40px auto; /* Añadido margen superior e inferior para despegarlo de los bordes del navegador */
+    padding-bottom: 60px;
+}
+
+/* CARDS */
+.card {
+    background: white;
+    border-radius: 26px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 40px -10px rgba(15,23,42,0.06); /* Sombra más suave y extendida */
+    padding: 32px; /* Añadido padding para que los elementos internos no toquen el borde */
+    margin-bottom: 32px; /* Separación vertical entre tarjetas */
+}
+
+/* HERO TITLE */
+.title-main {
+    font-size: 68px;
+    font-weight: 900;
+    line-height: 1.15; /* Subido de 1 a 1.15 para que las líneas de texto no se aplasten */
+    letter-spacing: -3px;
+    color: #2563eb; /* Actualizado al azul de tu imagen en lugar de negro */
+    max-width: 700px;
+    margin-bottom: 24px; /* Separación del subtítulo */
+}
+
+/* SECTION TITLES */
+.title-section {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: #020617;
+    margin-bottom: 16px; /* Separación con su contenido inferior */
+}
+
+/* SUBTITLES */
+.subtitle {
+    color: #64748b;
+    font-size: 18px;
+    line-height: 1.7;
+    max-width: 760px;
+    margin-bottom: 32px; /* Espacio crucial para separar el texto de los botones */
+}
+
+/* BUTTONS */
+.btn-primary {
+    background: #2563eb; /* Azul para coincidir con tu imagen */
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); /* Sombra para dar relieve */
+    margin-right: 12px; /* Separación entre botones */
+    margin-bottom: 12px;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.btn-secondary {
+    background: white; /* Blanco limpio como en la imagen */
+    color: #334155;
+    border: 1px solid #cbd5e1; /* Borde sutil */
+    border-radius: 16px;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 12px; /* Separación entre botones */
+    margin-bottom: 12px;
+}
+
+.btn-secondary:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    transform: translateY(-2px);
+}
+
+/* STATUS */
+.status-online {
+    background: #dcfce7;
+    color: #166534; /* Verde más oscuro para mejorar lectura */
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Espacio para el punto verde */
+    margin-top: 16px; /* Lo separa del texto superior */
+    border: 1px solid #bbf7d0;
+}
+
+/* Punto verde titilante para el estado online */
+.status-online::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* MINI CARDS */
+.mini-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px;
+    height: 100%;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+    margin-bottom: 16px; /* Separación por si se apilan verticalmente */
+    transition: transform 0.2s;
+}
+
+.mini-card:hover {
+    transform: translateY(-2px);
+}
+
+/* TABLE */
+.table-container {
+    background: transparent; /* Fondo transparente para que destaquen las filas */
+    border-radius: 22px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Esto da aire entre cada fila de la tabla */
+    margin-top: 24px;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 16px 28px;
+    background: #f1f5f9;
+    border-radius: 16px; /* Cabecera redondeada */
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    align-items: center;
+    padding: 20px 28px; /* Más espacio interno */
+    background: white;
+    border-radius: 16px; /* Cada fila se vuelve una "tarjeta" independiente */
+    border: 1px solid #e2e8f0;
+    font-size: 15px;
+    transition: all 0.2s;
+}
+
+.table-row:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transform: scale(1.01);
+}
+
+.table-row:last-child {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* CHART */
+.chart-wrapper {
+    background: #f8fafc;
+    border-radius: 22px;
+    padding: 30px;
+    margin-top: 24px;
+}
+
+/* ICON BOX */
+.icon-box {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    background: #f1f5f9;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+/* RESPONSIVE */
+@media(max-width:1200px) {
+    .title-main {
+        font-size: 54px;
+    }
+}
+
+@media(max-width:900px) {
+    .title-main {
+        font-size: 42px;
+    }
+    .title-section {
+        font-size: 28px;
+    }
+}
