@@ -1,603 +1,217 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QoS Network Intelligence</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<div class="container-dashboard py-10">
+    <div class="grid grid-cols-12 gap-8 items-center mb-12">
+        <div class="col-span-8">
+            <p class="text-blue-600 font-bold uppercase tracking-[3px] mb-5">
+                Network Analytics Platform
+            </p>
+            <h1 class="title-main">
+                QoS Network Intelligence
+            </h1>
+            <p class="subtitle mt-8">
+                Plataforma avanzada para monitoreo, simulación y análisis estadístico de tráfico de red. Diseñada para evaluar rendimiento, latencia y calidad de servicio.
+            </p>
 
-    <style>
-        /* =========================================
-           ESTILOS PERSONALIZADOS DEL DASHBOARD
-           ========================================= */
-        
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
-
-        .container-dashboard {
-            font-family: 'Inter', system-ui, sans-serif;
-            background-color: #f8fafc;
-            min-height: 100vh;
-            max-width: 1440px;
-            margin: 0 auto;
-            padding-left: 2rem;
-            padding-right: 2rem;
-        }
-
-        /* Tipografía */
-        .title-main {
-            font-size: 4.5rem;
-            line-height: 1.1;
-            font-weight: 900;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
-        }
-
-        .title-section {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: #0f172a;
-            letter-spacing: -0.01em;
-        }
-
-        .subtitle {
-            font-size: 1.125rem;
-            color: #64748b;
-            line-height: 1.6;
-            max-width: 80%;
-        }
-
-        /* Tarjetas (Cards) */
-        .card {
-            background: #ffffff;
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.12);
-        }
-
-        .mini-card {
-            background: #f8fafc;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            border: 1px solid #e2e8f0;
-            transition: background 0.3s ease;
-        }
-
-        .mini-card:hover {
-            background: #f1f5f9;
-        }
-
-        /* Botones */
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-            padding: 0.75rem 1.75rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
-            transition: all 0.2s ease-in-out;
-        }
-
-        .btn-primary:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.23);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #334155;
-            padding: 0.75rem 1.75rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            transition: all 0.2s ease-in-out;
-        }
-
-        .btn-secondary:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-            transform: translateY(-2px);
-        }
-
-        /* Tablas */
-        .table-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            width: 100%;
-        }
-
-        .table-header {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            padding: 1rem 1.5rem;
-            background: #f1f5f9;
-            border-radius: 0.75rem;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.05em;
-        }
-
-        .table-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            padding: 1.25rem 1.5rem;
-            background: #ffffff;
-            border-radius: 0.75rem;
-            border: 1px solid #e2e8f0;
-            align-items: center;
-            transition: all 0.2s;
-        }
-
-        .table-row:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-            transform: scale(1.01);
-        }
-
-        /* Indicador de Estado (Badge) */
-        .status-online {
-            background: #dcfce7;
-            color: #166534;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-weight: 700;
-            font-size: 0.875rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            border: 1px solid #bbf7d0;
-        }
-
-        .status-online::before {
-            content: '';
-            display: block;
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            animation: pulse-green 2s infinite;
-        }
-
-        @keyframes pulse-green {
-            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container-dashboard py-10">
-
-        <div class="grid grid-cols-12 gap-8 items-center mb-12">
-
-            <div class="col-span-8">
-
-                <p class="text-blue-600 font-bold uppercase tracking-[3px] mb-5">
-                    Network Analytics Platform
-                </p>
-
-                <h1 class="title-main">
-                    QoS Network
-                    Intelligence
-                </h1>
-
-                <p class="subtitle mt-8">
-                    Plataforma avanzada para monitoreo,
-                    simulación y análisis estadístico de tráfico de red.
-                    Diseñada para evaluar rendimiento,
-                    latencia y calidad de servicio.
-                </p>
-
-                <div class="flex gap-4 mt-10">
-
-                    <button class="btn-primary">
-                        Dashboard
-                    </button>
-
-                    <button class="btn-secondary">
-                        Estadísticas
-                    </button>
-
-                    <button class="btn-secondary">
-                        Reportes
-                    </button>
-
-                </div>
-
-            </div>
-
-            <div class="col-span-4">
-
-                <div class="card p-8">
-
-                    <div class="flex justify-between items-start">
-
-                        <div>
-
-                            <p class="text-slate-500 text-lg">
-                                Estado General
-                            </p>
-
-                            <h1 class="text-5xl font-black mt-4">
-                                ONLINE
-                            </h1>
-
-                        </div>
-
-                        <div class="status-online">
-                            Active
-                        </div>
-
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 mt-10">
-
-                        <div class="mini-card">
-
-                            <p class="text-slate-500">
-                                Nodos
-                            </p>
-
-                            <h1 class="text-4xl font-black mt-4">
-                                48
-                            </h1>
-
-                        </div>
-
-                        <div class="mini-card">
-
-                            <p class="text-slate-500">
-                                Usuarios
-                            </p>
-
-                            <h1 class="text-4xl font-black mt-4">
-                                1.2K
-                            </h1>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="card p-10 mb-10">
-
-            <div class="flex justify-between items-center mb-10">
-
-                <div>
-
-                    <h1 class="title-section">
-                        Métricas de Rendimiento
-                    </h1>
-
-                    <p class="subtitle mt-4">
-                        Monitoreo estadístico del tráfico y comportamiento de la red.
-                    </p>
-
-                </div>
-
-                <button class="btn-primary">
-                    Actualizar
+            <div class="flex gap-4 mt-10">
+                <button (click)="setTab('dashboard')" [class]="activeTab() === 'dashboard' ? 'btn-primary' : 'btn-secondary'">
+                    Dashboard
                 </button>
-
+                <button (click)="setTab('estadisticas')" [class]="activeTab() === 'estadisticas' ? 'btn-primary' : 'btn-secondary'">
+                    Estadísticas
+                </button>
+                <button (click)="setTab('reportes')" [class]="activeTab() === 'reportes' ? 'btn-primary' : 'btn-secondary'">
+                    Reportes
+                </button>
             </div>
-
-            <div class="table-container">
-
-                <div class="table-header">
-
-                    <div>Métrica</div>
-                    <div>Valor</div>
-                    <div>Estado</div>
-                    <div>Tendencia</div>
-
-                </div>
-
-                <div class="table-row">
-
-                    <div class="font-semibold">
-                        Latencia
-                    </div>
-
-                    <div class="font-bold">
-                        24 ms
-                    </div>
-
-                    <div class="text-green-600 font-bold">
-                        Óptimo
-                    </div>
-
-                    <div>
-                        ↗ +2%
-                    </div>
-
-                </div>
-
-                <div class="table-row">
-
-                    <div class="font-semibold">
-                        Packet Loss
-                    </div>
-
-                    <div class="font-bold">
-                        2%
-                    </div>
-
-                    <div class="text-yellow-500 font-bold">
-                        Moderado
-                    </div>
-
-                    <div>
-                        ↘ -1%
-                    </div>
-
-                </div>
-
-                <div class="table-row">
-
-                    <div class="font-semibold">
-                        Throughput
-                    </div>
-
-                    <div class="font-bold">
-                        150 Mbps
-                    </div>
-
-                    <div class="text-blue-600 font-bold">
-                        Estable
-                    </div>
-
-                    <div>
-                        ↗ +12%
-                    </div>
-
-                </div>
-
-                <div class="table-row">
-
-                    <div class="font-semibold">
-                        Jitter
-                    </div>
-
-                    <div class="font-bold">
-                        5 ms
-                    </div>
-
-                    <div class="text-green-600 font-bold">
-                        Óptimo
-                    </div>
-
-                    <div>
-                        ↘ -4%
-                    </div>
-
-                </div>
-
-            </div>
-
         </div>
 
-        <div class="card p-10 mb-10">
-
-            <div class="flex justify-between items-center mb-10">
-
-                <div>
-
-                    <h1 class="title-section">
-                        Traffic Analytics
-                    </h1>
-
-                    <p class="subtitle mt-4">
-                        Análisis visual y estadístico del tráfico de red.
-                    </p>
-
+        <div class="col-span-4">
+            <div class="card p-8">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-slate-500 text-lg">Estado General</p>
+                        <h1 class="text-5xl font-black mt-4">ONLINE</h1>
+                    </div>
+                    <div class="status-online">Active</div>
                 </div>
-
-                <div class="flex gap-4">
-
-                    <button class="btn-primary">
-                        Día
-                    </button>
-
-                    <button class="btn-secondary">
-                        Semana
-                    </button>
-
-                    <button class="btn-secondary">
-                        Mes
-                    </button>
-
+                <div class="grid grid-cols-2 gap-4 mt-10">
+                    <div class="mini-card">
+                        <p class="text-slate-500">Nodos</p>
+                        <h1 class="text-4xl font-black mt-4">48</h1>
+                    </div>
+                    <div class="mini-card">
+                        <p class="text-slate-500">Usuarios</p>
+                        <h1 class="text-4xl font-black mt-4">1.2K</h1>
+                    </div>
                 </div>
-
             </div>
-
-            <div class="bg-slate-50 rounded-3xl p-6">
-
-                <app-charts></app-charts>
-
-            </div>
-
         </div>
-
-        <div class="grid grid-cols-12 gap-8">
-
-            <div class="col-span-7">
-
-                <div class="card p-10 h-full">
-
-                    <div class="flex justify-between items-center mb-10">
-
-                        <div>
-
-                            <h1 class="title-section">
-                                Estado de Nodos
-                            </h1>
-
-                            <p class="subtitle mt-4">
-                                Infraestructura y monitoreo de conectividad.
-                            </p>
-
-                        </div>
-
-                        <button class="btn-primary">
-                            Exportar
-                        </button>
-
-                    </div>
-
-                    <div class="table-container">
-
-                        <div class="table-header">
-
-                            <div>Nodo</div>
-                            <div>Estado</div>
-                            <div>CPU</div>
-                            <div>Conectividad</div>
-
-                        </div>
-
-                        <div class="table-row">
-
-                            <div>Router Central</div>
-
-                            <div class="text-green-600 font-bold">
-                                ONLINE
-                            </div>
-
-                            <div>74%</div>
-
-                            <div>Estable</div>
-
-                        </div>
-
-                        <div class="table-row">
-
-                            <div>Servidor QoS</div>
-
-                            <div class="text-green-600 font-bold">
-                                ONLINE
-                            </div>
-
-                            <div>52%</div>
-
-                            <div>Excelente</div>
-
-                        </div>
-
-                        <div class="table-row">
-
-                            <div>Gateway Principal</div>
-
-                            <div class="text-yellow-500 font-bold">
-                                MODERADO
-                            </div>
-
-                            <div>88%</div>
-
-                            <div>Saturación parcial</div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="col-span-5">
-
-                <div class="card p-10 h-full">
-
-                    <h1 class="title-section mb-10">
-                        Resumen General
-                    </h1>
-
-                    <div class="space-y-5">
-
-                        <div class="mini-card flex justify-between items-center">
-
-                            <div>
-
-                                <p class="text-slate-500">
-                                    Disponibilidad
-                                </p>
-
-                                <h1 class="text-5xl font-black mt-3">
-                                    99.9%
-                                </h1>
-
-                            </div>
-
-                            <div class="text-5xl">
-                                🌐
-                            </div>
-
-                        </div>
-
-                        <div class="mini-card flex justify-between items-center">
-
-                            <div>
-
-                                <p class="text-slate-500">
-                                    Tiempo Promedio
-                                </p>
-
-                                <h1 class="text-5xl font-black mt-3">
-                                    24ms
-                                </h1>
-
-                            </div>
-
-                            <div class="text-5xl">
-                                ⚡
-                            </div>
-
-                        </div>
-
-                        <div class="mini-card flex justify-between items-center">
-
-                            <div>
-
-                                <p class="text-slate-500">
-                                    Throughput
-                                </p>
-
-                                <h1 class="text-5xl font-black mt-3">
-                                    150
-                                </h1>
-
-                            </div>
-
-                            <div class="text-5xl">
-                                🚀
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
     </div>
-</body>
-</html>
+
+    @switch (activeTab()) {
+        @case ('dashboard') {
+            <div class="card p-10 mb-10">
+                <div class="flex justify-between items-center mb-10">
+                    <div>
+                        <h1 class="title-section">Métricas de Rendimiento</h1>
+                        <p class="subtitle mt-4">Monitoreo estadístico del tráfico y comportamiento de la red.</p>
+                    </div>
+                    <button (click)="refreshData()" class="btn-primary">Actualizar</button>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <div>Métrica</div>
+                        <div>Valor</div>
+                        <div>Estado</div>
+                        <div>Tendencia</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="font-semibold">Latencia</div>
+                        <div class="font-bold">{{ metrics().latency }} ms</div>
+                        <div [class]="metrics().latency < 30 ? 'text-green-600 font-bold' : 'text-yellow-500 font-bold'">
+                            {{ metrics().latency < 30 ? 'Óptimo' : 'Moderado' }}
+                        </div>
+                        <div>↗ +2%</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="font-semibold">Packet Loss</div>
+                        <div class="font-bold">{{ metrics().packetLoss }}%</div>
+                        <div [class]="metrics().packetLoss < 3 ? 'text-green-600 font-bold' : 'text-yellow-500 font-bold'">
+                            {{ metrics().packetLoss < 3 ? 'Bajo' : 'Moderado' }}
+                        </div>
+                        <div>↘ -1%</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="font-semibold">Throughput</div>
+                        <div class="font-bold">{{ metrics().throughput }} Mbps</div>
+                        <div class="text-blue-600 font-bold">Estable</div>
+                        <div>↗ +12%</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="font-semibold">Jitter</div>
+                        <div class="font-bold">{{ metrics().jitter }} ms</div>
+                        <div [class]="metrics().jitter < 10 ? 'text-green-600 font-bold' : 'text-red-500 font-bold'">
+                            {{ metrics().jitter < 10 ? 'Óptimo' : 'Crítico' }}
+                        </div>
+                        <div>↘ -4%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-10 mb-10">
+                <div class="flex justify-between items-center mb-10">
+                    <div>
+                        <h1 class="title-section">Traffic Analytics</h1>
+                        <p class="subtitle mt-4">Análisis visual y estadístico del tráfico de red.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <button (click)="setTimeframe('dia')" [class]="chartTimeframe() === 'dia' ? 'btn-primary' : 'btn-secondary'">Día</button>
+                        <button (click)="setTimeframe('semana')" [class]="chartTimeframe() === 'semana' ? 'btn-primary' : 'btn-secondary'">Semana</button>
+                        <button (click)="setTimeframe('mes')" [class]="chartTimeframe() === 'mes' ? 'btn-primary' : 'btn-secondary'">Mes</button>
+                    </div>
+                </div>
+                <div class="bg-slate-50 rounded-3xl p-6">
+                    @if (chartTimeframe() === 'dia') {
+                        <p class="text-center py-10 text-slate-500">Mostrando datos de las últimas 24 horas...</p>
+                        <app-charts></app-charts>
+                    }
+                    @if (chartTimeframe() === 'semana') {
+                        <p class="text-center py-10 text-slate-500">Mostrando tendencia de los últimos 7 días...</p>
+                    }
+                    @if (chartTimeframe() === 'mes') {
+                        <p class="text-center py-10 text-slate-500">Mostrando consolidado mensual...</p>
+                    }
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-8">
+                <div class="col-span-7">
+                    <div class="card p-10 h-full">
+                        <div class="flex justify-between items-center mb-10">
+                            <div>
+                                <h1 class="title-section">Estado de Nodos</h1>
+                                <p class="subtitle mt-4">Infraestructura y monitoreo de conectividad.</p>
+                            </div>
+                            <button (click)="exportData()" class="btn-primary">Exportar</button>
+                        </div>
+                        <div class="table-container">
+                            <div class="table-header">
+                                <div>Nodo</div>
+                                <div>Estado</div>
+                                <div>CPU</div>
+                                <div>Conectividad</div>
+                            </div>
+                            <div class="table-row">
+                                <div>Router Central</div>
+                                <div class="text-green-600 font-bold">ONLINE</div>
+                                <div>74%</div>
+                                <div>Estable</div>
+                            </div>
+                            <div class="table-row">
+                                <div>Servidor QoS</div>
+                                <div class="text-green-600 font-bold">ONLINE</div>
+                                <div>52%</div>
+                                <div>Excelente</div>
+                            </div>
+                            <div class="table-row">
+                                <div>Gateway Principal</div>
+                                <div class="text-yellow-500 font-bold">MODERADO</div>
+                                <div>88%</div>
+                                <div>Saturación parcial</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-5">
+                    <div class="card p-10 h-full">
+                        <h1 class="title-section mb-10">Resumen General</h1>
+                        <div class="space-y-5">
+                            <div class="mini-card flex justify-between items-center">
+                                <div>
+                                    <p class="text-slate-500">Disponibilidad</p>
+                                    <h1 class="text-5xl font-black mt-3">99.9%</h1>
+                                </div>
+                                <div class="text-5xl">🌐</div>
+                            </div>
+                            <div class="mini-card flex justify-between items-center">
+                                <div>
+                                    <p class="text-slate-500">Tiempo Promedio</p>
+                                    <h1 class="text-5xl font-black mt-3">{{ metrics().latency }}ms</h1>
+                                </div>
+                                <div class="text-5xl">⚡</div>
+                            </div>
+                            <div class="mini-card flex justify-between items-center">
+                                <div>
+                                    <p class="text-slate-500">Throughput</p>
+                                    <h1 class="text-5xl font-black mt-3">{{ metrics().throughput }}</h1>
+                                </div>
+                                <div class="text-5xl">🚀</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @case ('estadisticas') {
+            <div class="card p-10">
+                <h1 class="title-section">Módulo de Estadísticas Avanzadas</h1>
+                <p class="subtitle mt-4">Aquí puedes incrustar el componente de simulación de redes o gráficos profundos.</p>
+                <div class="mt-8">
+                    <app-network-simulator></app-network-simulator>
+                </div>
+            </div>
+        }
+
+        @case ('reportes') {
+            <div class="card p-10">
+                <h1 class="title-section">Centro de Reportes y Logs</h1>
+                <p class="subtitle mt-4">Sección dedicada a la auditoría e historial de la red.</p>
+                <div class="mt-8 bg-slate-50 p-6 rounded-xl border border-slate-200 text-center">
+                    <p class="text-slate-500 mb-4">No hay reportes generados hoy.</p>
+                    <button class="btn-primary">Generar Nuevo Reporte</button>
+                </div>
+            </div>
+        }
+    }
+</div>
