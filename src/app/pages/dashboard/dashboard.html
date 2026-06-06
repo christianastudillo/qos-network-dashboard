@@ -1,46 +1,55 @@
-<div class="container-dashboard py-10">
-    <div class="grid grid-cols-12 gap-8 items-center mb-12">
-        <div class="col-span-8">
-            <p class="text-blue-600 font-bold uppercase tracking-[3px] mb-5">
+<div class="container-dashboard py-6 md:py-10 px-4 md:px-8 bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300 overflow-x-hidden">
+    
+    @if (toastMessage()) {
+        <div class="fixed bottom-5 right-5 z-50 flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl text-white animate-bounce transition-all max-w-[90vw]"
+             [style.background-color]="toastType() === 'success' ? '#10b981' : '#3b82f6'">
+            <span>{{ toastType() === 'success' ? '📊' : 'ℹ️' }}</span>
+            <p class="font-semibold text-sm m-0">{{ toastMessage() }}</p>
+        </div>
+    }
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-12">
+        <div class="col-span-1 lg:col-span-8 text-center lg:text-left">
+            <p class="text-blue-600 dark:text-blue-400 font-bold uppercase tracking-[2px] md:tracking-[3px] mb-3 md:mb-5 text-sm md:text-base">
                 Network Analytics Platform
             </p>
-            <h1 class="title-main">
+            <h1 class="title-main dark:from-blue-400 dark:to-cyan-400 text-4xl md:text-6xl font-black">
                 QoS Network Intelligence
             </h1>
-            <p class="subtitle mt-8">
+            <p class="subtitle mt-4 md:mt-8 text-slate-600 dark:text-slate-400 mx-auto lg:mx-0 max-w-2xl text-sm md:text-base">
                 Plataforma avanzada para monitoreo, simulación y análisis estadístico de tráfico de red. Diseñada para evaluar rendimiento, latencia y calidad de servicio.
             </p>
 
-            <div class="flex gap-4 mt-10">
-                <button (click)="setTab('dashboard')" [class]="activeTab() === 'dashboard' ? 'btn-primary' : 'btn-secondary'">
+            <div class="flex flex-wrap justify-center lg:justify-start gap-3 md:gap-4 mt-8 md:mt-10">
+                <button (click)="setTab('dashboard')" [class]="activeTab() === 'dashboard' ? 'btn-primary' : 'btn-secondary dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'">
                     Dashboard
                 </button>
-                <button (click)="setTab('estadisticas')" [class]="activeTab() === 'estadisticas' ? 'btn-primary' : 'btn-secondary'">
+                <button (click)="setTab('estadisticas')" [class]="activeTab() === 'estadisticas' ? 'btn-primary' : 'btn-secondary dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'">
                     Estadísticas
                 </button>
-                <button (click)="setTab('reportes')" [class]="activeTab() === 'reportes' ? 'btn-primary' : 'btn-secondary'">
+                <button (click)="setTab('reportes')" [class]="activeTab() === 'reportes' ? 'btn-primary' : 'btn-secondary dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'">
                     Reportes
                 </button>
             </div>
         </div>
 
-        <div class="col-span-4">
-            <div class="card p-8">
+        <div class="col-span-1 lg:col-span-4 mt-8 lg:mt-0">
+            <div class="card p-6 md:p-8 dark:bg-slate-800 dark:border-slate-700">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-slate-500 text-lg">Estado General</p>
-                        <h1 class="text-5xl font-black mt-4">ONLINE</h1>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm md:text-lg">Estado General</p>
+                        <h1 class="text-4xl md:text-5xl font-black mt-2 md:mt-4 text-slate-900 dark:text-white">ONLINE</h1>
                     </div>
-                    <div class="status-online">Active</div>
+                    <div class="status-online text-xs md:text-sm">Active</div>
                 </div>
-                <div class="grid grid-cols-2 gap-4 mt-10">
-                    <div class="mini-card">
-                        <p class="text-slate-500">Nodos</p>
-                        <h1 class="text-4xl font-black mt-4">48</h1>
+                <div class="grid grid-cols-2 gap-3 md:gap-4 mt-8 md:mt-10">
+                    <div class="mini-card p-4 md:p-6 dark:bg-slate-900/50 dark:border-slate-700">
+                        <p class="text-slate-500 dark:text-slate-400 text-xs md:text-base">Nodos</p>
+                        <h1 class="text-2xl md:text-4xl font-black mt-2 md:mt-4 text-slate-900 dark:text-white">48</h1>
                     </div>
-                    <div class="mini-card">
-                        <p class="text-slate-500">Usuarios</p>
-                        <h1 class="text-4xl font-black mt-4">1.2K</h1>
+                    <div class="mini-card p-4 md:p-6 dark:bg-slate-900/50 dark:border-slate-700">
+                        <p class="text-slate-500 dark:text-slate-400 text-xs md:text-base">Usuarios</p>
+                        <h1 class="text-2xl md:text-4xl font-black mt-2 md:mt-4 text-slate-900 dark:text-white">1.2K</h1>
                     </div>
                 </div>
             </div>
@@ -49,154 +58,131 @@
 
     @switch (activeTab()) {
         @case ('dashboard') {
-            <div class="card p-10 mb-10">
-                <div class="flex justify-between items-center mb-10">
-                    <div>
-                        <h1 class="title-section">Métricas de Rendimiento</h1>
-                        <p class="subtitle mt-4">Monitoreo estadístico del tráfico y comportamiento de la red.</p>
+            <div [@tabAnimation]>
+                <div class="card p-6 md:p-10 mb-8 md:mb-10 dark:bg-slate-800 dark:border-slate-700">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-10 gap-4">
+                        <div>
+                            <h1 class="title-section text-xl md:text-2xl dark:text-white">Traffic Analytics</h1>
+                            <p class="subtitle mt-2 text-sm md:text-base text-slate-600 dark:text-slate-400">Análisis visual e interactivo del tráfico de red.</p>
+                        </div>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <button (click)="setTimeframe('dia')" [class]="chartTimeframe() === 'dia' ? 'btn-primary flex-1 md:flex-none' : 'btn-secondary flex-1 md:flex-none dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700'">Día</button>
+                            <button (click)="setTimeframe('semana')" [class]="chartTimeframe() === 'semana' ? 'btn-primary flex-1 md:flex-none' : 'btn-secondary flex-1 md:flex-none dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700'">Sem.</button>
+                        </div>
                     </div>
-                    <button (click)="refreshData()" class="btn-primary">Actualizar</button>
+                    <div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl md:rounded-3xl p-4 md:p-6 w-full">
+                        <app-charts [realTimeData]="metrics().latency"></app-charts>
+                    </div>
                 </div>
 
-                <div class="table-container">
-                    <div class="table-header">
-                        <div>Métrica</div>
-                        <div>Valor</div>
-                        <div>Estado</div>
-                        <div>Tendencia</div>
-                    </div>
-                    <div class="table-row">
-                        <div class="font-semibold">Latencia</div>
-                        <div class="font-bold">{{ metrics().latency }} ms</div>
-                        <div [class]="metrics().latency < 30 ? 'text-green-600 font-bold' : 'text-yellow-500 font-bold'">
-                            {{ metrics().latency < 30 ? 'Óptimo' : 'Moderado' }}
-                        </div>
-                        <div>↗ +2%</div>
-                    </div>
-                    <div class="table-row">
-                        <div class="font-semibold">Packet Loss</div>
-                        <div class="font-bold">{{ metrics().packetLoss }}%</div>
-                        <div [class]="metrics().packetLoss < 3 ? 'text-green-600 font-bold' : 'text-yellow-500 font-bold'">
-                            {{ metrics().packetLoss < 3 ? 'Bajo' : 'Moderado' }}
-                        </div>
-                        <div>↘ -1%</div>
-                    </div>
-                    <div class="table-row">
-                        <div class="font-semibold">Throughput</div>
-                        <div class="font-bold">{{ metrics().throughput }} Mbps</div>
-                        <div class="text-blue-600 font-bold">Estable</div>
-                        <div>↗ +12%</div>
-                    </div>
-                    <div class="table-row">
-                        <div class="font-semibold">Jitter</div>
-                        <div class="font-bold">{{ metrics().jitter }} ms</div>
-                        <div [class]="metrics().jitter < 10 ? 'text-green-600 font-bold' : 'text-red-500 font-bold'">
-                            {{ metrics().jitter < 10 ? 'Óptimo' : 'Crítico' }}
-                        </div>
-                        <div>↘ -4%</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card p-10 mb-10">
-                <div class="flex justify-between items-center mb-10">
-                    <div>
-                        <h1 class="title-section">Traffic Analytics</h1>
-                        <p class="subtitle mt-4">Análisis visual y estadístico del tráfico de red.</p>
-                    </div>
-                    <div class="flex gap-4">
-                        <button (click)="setTimeframe('dia')" [class]="chartTimeframe() === 'dia' ? 'btn-primary' : 'btn-secondary'">Día</button>
-                        <button (click)="setTimeframe('semana')" [class]="chartTimeframe() === 'semana' ? 'btn-primary' : 'btn-secondary'">Semana</button>
-                        <button (click)="setTimeframe('mes')" [class]="chartTimeframe() === 'mes' ? 'btn-primary' : 'btn-secondary'">Mes</button>
-                    </div>
-                </div>
-                <div class="bg-slate-50 rounded-3xl p-6">
-                    @if (chartTimeframe() === 'dia') {
-                        <p class="text-center py-10 text-slate-500">Mostrando datos de las últimas 24 horas...</p>
-                        <app-charts></app-charts>
-                    }
-                    @if (chartTimeframe() === 'semana') {
-                        <p class="text-center py-10 text-slate-500">Mostrando tendencia de los últimos 7 días...</p>
-                    }
-                    @if (chartTimeframe() === 'mes') {
-                        <p class="text-center py-10 text-slate-500">Mostrando consolidado mensual...</p>
-                    }
-                </div>
-            </div>
-
-            <div class="grid grid-cols-12 gap-8">
-                <div class="col-span-7">
-                    <div class="card p-10 h-full">
-                        <div class="flex justify-between items-center mb-10">
-                            <div>
-                                <h1 class="title-section">Estado de Nodos</h1>
-                                <p class="subtitle mt-4">Infraestructura y monitoreo de conectividad.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 md:mb-10">
+                    <div class="col-span-1 lg:col-span-7">
+                        <div class="card p-6 md:p-10 h-full dark:bg-slate-800 dark:border-slate-700">
+                            <div class="flex justify-between items-center mb-6 md:mb-10">
+                                <div>
+                                    <h1 class="title-section text-xl md:text-2xl dark:text-white">Métricas de Rendimiento</h1>
+                                </div>
+                                <button (click)="refreshData()" class="btn-primary p-2 md:px-6">↻</button>
                             </div>
-                            <button (click)="exportData()" class="btn-primary">Exportar</button>
+                            
+                            <div class="table-container overflow-x-auto w-full">
+                                <div class="min-w-[500px]">
+                                    <div class="table-header dark:bg-slate-900 dark:text-slate-400 text-xs md:text-sm">
+                                        <div>Métrica</div>
+                                        <div>Valor</div>
+                                        <div>Estado</div>
+                                        <div>Tendencia</div>
+                                    </div>
+                                    <div class="table-row dark:bg-slate-800 dark:border-slate-700 text-sm md:text-base">
+                                        <div class="font-semibold dark:text-slate-300">Latencia</div>
+                                        <div class="font-bold dark:text-white">{{ metrics().latency }} ms</div>
+                                        <div [class]="metrics().latency < 30 ? 'text-green-600 font-bold dark:text-green-400' : 'text-yellow-500 font-bold'">{{ metrics().latency < 30 ? 'Óptimo' : 'Moderado' }}</div>
+                                        <div class="text-slate-500">↗ +2%</div>
+                                    </div>
+                                    <div class="table-row dark:bg-slate-800 dark:border-slate-700 text-sm md:text-base">
+                                        <div class="font-semibold dark:text-slate-300">Packet Loss</div>
+                                        <div class="font-bold dark:text-white">{{ metrics().packetLoss }}%</div>
+                                        <div [class]="metrics().packetLoss < 3 ? 'text-green-600 font-bold dark:text-green-400' : 'text-yellow-500 font-bold'">{{ metrics().packetLoss < 3 ? 'Bajo' : 'Moderado' }}</div>
+                                        <div class="text-slate-500">↘ -1%</div>
+                                    </div>
+                                    <div class="table-row dark:bg-slate-800 dark:border-slate-700 text-sm md:text-base">
+                                        <div class="font-semibold dark:text-slate-300">Throughput</div>
+                                        <div class="font-bold dark:text-white">{{ metrics().throughput }} Mbps</div>
+                                        <div class="text-blue-600 font-bold dark:text-blue-400">Estable</div>
+                                        <div class="text-slate-500">↗ +12%</div>
+                                    </div>
+                                    <div class="table-row dark:bg-slate-800 dark:border-slate-700 text-sm md:text-base">
+                                        <div class="font-semibold dark:text-slate-300">Jitter</div>
+                                        <div class="font-bold dark:text-white">{{ metrics().jitter }} ms</div>
+                                        <div [class]="metrics().jitter < 10 ? 'text-green-600 font-bold dark:text-green-400' : 'text-red-500 font-bold dark:text-red-400'">{{ metrics().jitter < 10 ? 'Óptimo' : 'Crítico' }}</div>
+                                        <div class="text-slate-500">↘ -4%</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="table-container">
-                            <div class="table-header">
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-5">
+                        <div class="card p-6 md:p-10 h-full dark:bg-slate-800 dark:border-slate-700">
+                            <h1 class="title-section text-xl md:text-2xl mb-6 md:mb-10 dark:text-white">Resumen General</h1>
+                            <div class="space-y-4 md:space-y-5">
+                                <div class="mini-card flex justify-between items-center dark:bg-slate-900/50 dark:border-slate-700 p-4 md:p-6">
+                                    <div>
+                                        <p class="text-slate-500 dark:text-slate-400 text-xs md:text-sm">Disponibilidad</p>
+                                        <h1 class="text-3xl md:text-5xl font-black mt-2 md:mt-3 text-slate-900 dark:text-white">99.9%</h1>
+                                    </div>
+                                    <div class="text-4xl md:text-5xl">🌐</div>
+                                </div>
+                                <div class="mini-card flex justify-between items-center dark:bg-slate-900/50 dark:border-slate-700 p-4 md:p-6">
+                                    <div>
+                                        <p class="text-slate-500 dark:text-slate-400 text-xs md:text-sm">Latencia Promedio</p>
+                                        <h1 class="text-3xl md:text-5xl font-black mt-2 md:mt-3 text-slate-900 dark:text-white">{{ metrics().latency }}ms</h1>
+                                    </div>
+                                    <div class="text-4xl md:text-5xl">⚡</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6 md:p-10 mb-8 md:mb-10 dark:bg-slate-800 dark:border-slate-700">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-10 gap-4">
+                        <div>
+                            <h1 class="title-section text-xl md:text-2xl dark:text-white">Estado de Nodos</h1>
+                            <p class="subtitle mt-2 text-sm md:text-base text-slate-600 dark:text-slate-400">Infraestructura y monitoreo de conectividad.</p>
+                        </div>
+                        <button (click)="exportData()" class="btn-primary w-full sm:w-auto">Exportar CSV</button>
+                    </div>
+                    <div class="table-container overflow-x-auto w-full">
+                        <div class="min-w-[500px]">
+                            <div class="table-header dark:bg-slate-900 dark:text-slate-400 text-xs md:text-sm">
                                 <div>Nodo</div>
                                 <div>Estado</div>
                                 <div>CPU</div>
                                 <div>Conectividad</div>
                             </div>
-                            <div class="table-row">
-                                <div>Router Central</div>
-                                <div class="text-green-600 font-bold">ONLINE</div>
-                                <div>74%</div>
-                                <div>Estable</div>
-                            </div>
-                            <div class="table-row">
-                                <div>Servidor QoS</div>
-                                <div class="text-green-600 font-bold">ONLINE</div>
-                                <div>52%</div>
-                                <div>Excelente</div>
-                            </div>
-                            <div class="table-row">
-                                <div>Gateway Principal</div>
-                                <div class="text-yellow-500 font-bold">MODERADO</div>
-                                <div>88%</div>
-                                <div>Saturación parcial</div>
-                            </div>
+                            @for (node of nodesData(); track node.name) {
+                                <div class="table-row dark:bg-slate-800 dark:border-slate-700 hover:dark:bg-slate-900/30 text-sm md:text-base">
+                                    <div class="dark:text-slate-300 font-medium">{{ node.name }}</div>
+                                    <div [class]="node.status === 'ONLINE' ? 'text-green-600 dark:text-green-400 font-bold' : 'text-yellow-500 font-bold'">{{ node.status }}</div>
+                                    <div class="dark:text-slate-400">{{ node.cpu }}</div>
+                                    <div class="dark:text-slate-400">{{ node.conn }}</div>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
-                <div class="col-span-5">
-                    <div class="card p-10 h-full">
-                        <h1 class="title-section mb-10">Resumen General</h1>
-                        <div class="space-y-5">
-                            <div class="mini-card flex justify-between items-center">
-                                <div>
-                                    <p class="text-slate-500">Disponibilidad</p>
-                                    <h1 class="text-5xl font-black mt-3">99.9%</h1>
-                                </div>
-                                <div class="text-5xl">🌐</div>
-                            </div>
-                            <div class="mini-card flex justify-between items-center">
-                                <div>
-                                    <p class="text-slate-500">Tiempo Promedio</p>
-                                    <h1 class="text-5xl font-black mt-3">{{ metrics().latency }}ms</h1>
-                                </div>
-                                <div class="text-5xl">⚡</div>
-                            </div>
-                            <div class="mini-card flex justify-between items-center">
-                                <div>
-                                    <p class="text-slate-500">Throughput</p>
-                                    <h1 class="text-5xl font-black mt-3">{{ metrics().throughput }}</h1>
-                                </div>
-                                <div class="text-5xl">🚀</div>
-                            </div>
-                        </div>
-                    </div>
+
+                <div class="grid grid-cols-1 mt-8 md:mt-10">
+                    <app-ai-recommendations></app-ai-recommendations>
                 </div>
             </div>
         }
 
         @case ('estadisticas') {
-            <div class="card p-10">
-                <h1 class="title-section">Módulo de Estadísticas Avanzadas</h1>
-                <p class="subtitle mt-4">Aquí puedes incrustar el componente de simulación de redes o gráficos profundos.</p>
+            <div [@tabAnimation] class="card p-6 md:p-10 dark:bg-slate-800 dark:border-slate-700">
+                <h1 class="title-section text-2xl dark:text-white">Módulo de Estadísticas Avanzadas</h1>
+                <p class="subtitle mt-4 text-sm md:text-base text-slate-600 dark:text-slate-400">Simulación matemática basada en Teoría de Colas (M/M/1).</p>
                 <div class="mt-8">
                     <app-network-simulator></app-network-simulator>
                 </div>
@@ -204,12 +190,12 @@
         }
 
         @case ('reportes') {
-            <div class="card p-10">
-                <h1 class="title-section">Centro de Reportes y Logs</h1>
-                <p class="subtitle mt-4">Sección dedicada a la auditoría e historial de la red.</p>
-                <div class="mt-8 bg-slate-50 p-6 rounded-xl border border-slate-200 text-center">
-                    <p class="text-slate-500 mb-4">No hay reportes generados hoy.</p>
-                    <button class="btn-primary">Generar Nuevo Reporte</button>
+            <div [@tabAnimation] class="card p-6 md:p-10 dark:bg-slate-800 dark:border-slate-700">
+                <h1 class="title-section text-2xl dark:text-white">Centro de Reportes y Logs</h1>
+                <p class="subtitle mt-4 text-sm md:text-base text-slate-600 dark:text-slate-400">Sección dedicada a la auditoría e historial de la red.</p>
+                <div class="mt-8 bg-slate-50 dark:bg-slate-900/50 p-6 md:p-10 rounded-xl md:rounded-3xl border border-slate-200 dark:border-slate-700 text-center">
+                    <p class="text-slate-500 dark:text-slate-400 mb-6">No hay reportes generados hoy automáticamente.</p>
+                    <button (click)="generarReporte()" class="btn-primary w-full md:w-auto">Generar Nuevo Reporte de Auditoría</button>
                 </div>
             </div>
         }
