@@ -1,86 +1,49 @@
-<div class="glass p-10 rounded-3xl">
+<div class="card p-6 md:p-10 h-full dark:bg-slate-800 dark:border-slate-700">
+  <h1 class="title-section text-xl md:text-2xl mb-6 dark:text-white">
+    Modelo M/M/1
+  </h1>
 
-    <h1 class="text-4xl font-black mb-10">
-        Simulador Estadístico M/M/1
-    </h1>
+  @if (queueMetrics; as q) {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="mini-card p-5 dark:bg-slate-900/50 dark:border-slate-700">
+        <p class="text-slate-500 dark:text-slate-400 text-sm">Tasa de llegada λ</p>
+        <h2 class="text-3xl font-black text-blue-600 mt-3">
+          {{ q.lambda_rate | number:'1.2-2' }}
+        </h2>
+        <p class="text-xs text-slate-500 mt-2">solicitudes/s</p>
+      </div>
 
-    <div class="grid grid-cols-2 gap-8">
+      <div class="mini-card p-5 dark:bg-slate-900/50 dark:border-slate-700">
+        <p class="text-slate-500 dark:text-slate-400 text-sm">Tasa de servicio μ</p>
+        <h2 class="text-3xl font-black text-green-600 mt-3">
+          {{ q.mu_rate | number:'1.2-2' }}
+        </h2>
+        <p class="text-xs text-slate-500 mt-2">solicitudes/s</p>
+      </div>
 
-        <div>
+      <div class="mini-card p-5 dark:bg-slate-900/50 dark:border-slate-700">
+        <p class="text-slate-500 dark:text-slate-400 text-sm">Utilización ρ</p>
+        <h2 class="text-3xl font-black text-yellow-600 mt-3">
+          {{ q.rho_pct | number:'1.2-2' }}%
+        </h2>
+        <p class="text-xs text-slate-500 mt-2">{{ q.stability_status }}</p>
+      </div>
 
-            <label class="block mb-4 text-xl">
-                Lambda λ
-            </label>
-
-            <input
-                type="number"
-                [(ngModel)]="lambda"
-                class="w-full p-5 rounded-2xl bg-[#111827] border border-cyan-500/20"
-            >
-
-        </div>
-
-        <div>
-
-            <label class="block mb-4 text-xl">
-                Mu µ
-            </label>
-
-            <input
-                type="number"
-                [(ngModel)]="mu"
-                class="w-full p-5 rounded-2xl bg-[#111827] border border-cyan-500/20"
-            >
-
-        </div>
-
+      <div class="mini-card p-5 dark:bg-slate-900/50 dark:border-slate-700">
+        <p class="text-slate-500 dark:text-slate-400 text-sm">Tiempo en cola Wq</p>
+        <h2 class="text-3xl font-black text-red-600 mt-3">
+          {{ q.wq_ms | number:'1.2-2' }} ms
+        </h2>
+        <p class="text-xs text-slate-500 mt-2">M/M/1</p>
+      </div>
     </div>
 
-    <button
-        (click)="calculate()"
-        class="mt-10 bg-cyan-500 hover:bg-cyan-600 transition px-10 py-5 rounded-2xl text-xl font-bold"
-    >
-        Ejecutar Simulación
-    </button>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-
-        <div class="bg-[#111827] p-8 rounded-3xl">
-
-            <h2 class="text-gray-400 text-xl">
-                Utilización
-            </h2>
-
-            <h1 class="text-5xl font-black text-cyan-400 mt-6">
-                {{utilization.toFixed(2)}}
-            </h1>
-
-        </div>
-
-        <div class="bg-[#111827] p-8 rounded-3xl">
-
-            <h2 class="text-gray-400 text-xl">
-                Tiempo Promedio
-            </h2>
-
-            <h1 class="text-5xl font-black text-cyan-400 mt-6">
-                {{averageTime.toFixed(2)}}
-            </h1>
-
-        </div>
-
-        <div class="bg-[#111827] p-8 rounded-3xl">
-
-            <h2 class="text-gray-400 text-xl">
-                Longitud Cola
-            </h2>
-
-            <h1 class="text-5xl font-black text-cyan-400 mt-6">
-                {{queueLength.toFixed(2)}}
-            </h1>
-
-        </div>
-
+    <div class="mt-6 p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300">
+      {{ q.analysis_message }}
     </div>
-
+  } @else {
+    <div class="text-center py-12 text-slate-500 dark:text-slate-400">
+      Ejecuta una medición para calcular el modelo M/M/1.
+    </div>
+  }
 </div>

@@ -1,35 +1,23 @@
-<div class="grid grid-cols-2 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+  @for (metric of metrics; track metric.title) {
+    <div class="glass p-6 rounded-3xl card-hover relative overflow-hidden dark:bg-slate-800 dark:border-slate-700">
+      <div class="absolute top-[-40px] right-[-40px] w-[120px] h-[120px] bg-cyan-500/10 rounded-full blur-3xl"></div>
 
-    @for(metric of metrics; track metric){
+      <div class="flex justify-between items-center relative z-10">
+        <div>
+          <p class="text-slate-500 dark:text-slate-400 text-base">
+            {{ metric.title }}
+          </p>
 
-    <div class="glass p-8 rounded-3xl card-hover relative overflow-hidden">
-
-        <div class="absolute top-[-40px] right-[-40px] w-[120px] h-[120px] bg-cyan-500/10 rounded-full blur-3xl"></div>
-
-        <div class="flex justify-between items-center relative z-10">
-
-            <div>
-
-                <p class="text-gray-400 text-lg">
-                    {{metric.title}}
-                </p>
-
-                <h1 class="text-5xl font-black text-cyan-400 mt-5">
-                    {{metric.value}}
-                </h1>
-
-            </div>
-
-            <div class="w-20 h-20 rounded-3xl bg-cyan-500/10 glow flex items-center justify-center text-4xl">
-
-                {{metric.icon}}
-
-            </div>
-
+          <h1 class="text-3xl font-black text-cyan-500 mt-4">
+            {{ metric.value }}
+          </h1>
         </div>
 
+        <div class="w-16 h-16 rounded-3xl bg-cyan-500/10 glow flex items-center justify-center text-3xl">
+          {{ metric.icon }}
+        </div>
+      </div>
     </div>
-
-    }
-
+  }
 </div>
