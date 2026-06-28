@@ -1,17 +1,12 @@
-/* Soporte nativo para cuando se active la clase .dark en el tag <html> o padres */
+/* Dark mode overrides — se activan si el padre tiene clase .dark */
 :host-context(.dark) .card {
     background: #1e293b;
     border-color: #334155;
-    box-shadow: 0 10px 30px -15px rgba(0,0,0,0.5);
 }
 
 :host-context(.dark) .mini-card {
     background: #0f172a;
     border-color: #334155;
-}
-
-:host-context(.dark) .mini-card:hover {
-    background: #1e293b;
 }
 
 :host-context(.dark) .table-header {

@@ -1,0 +1,63 @@
+/* El componente usa las clases globales .glass y .card-hover definidas en styles.css */
+
+/* Color del ícono */
+.icon-bg {
+    background: rgba(6, 182, 212, 0.1);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+
+/* Valor de la métrica */
+.metric-val {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: #06b6d4;
+    margin: 12px 0 0;
+    letter-spacing: -0.04em;
+    line-height: 1;
+}
+
+/* Label */
+.metric-lbl {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Grid responsivo */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .metric-val {
+        font-size: 1.4rem;
+    }
+
+    .icon-bg {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+        border-radius: 12px;
+    }
+}
