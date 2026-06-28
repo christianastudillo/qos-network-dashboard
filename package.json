@@ -12,8 +12,12 @@
   "private": true,
   "packageManager": "npm@11.12.1",
   "dependencies": {
+<<<<<<< HEAD
     "@angular/animations": "^21.2.0",
     "@angular/cdk": "^21.2.12",
+=======
+    "@angular/animations": "21.2.12",
+>>>>>>> 395341848ebdf95e430c46a45f3026d1c7a5446d
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
     "@angular/core": "^21.2.0",
