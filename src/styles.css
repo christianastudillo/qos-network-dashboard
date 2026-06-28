@@ -9,17 +9,18 @@ body {
     color: #0f172a;
 }
 
-/* GLOBAL */
 * {
     box-sizing: border-box;
 }
 
 /* MAIN CONTAINER */
 .container-dashboard {
-    width: 90%;
+    width: 92%;
     max-width: 1450px;
-    margin: 40px auto; /* Añadido margen superior e inferior para despegarlo de los bordes del navegador */
+    margin: 24px auto;
     padding-bottom: 60px;
+    padding-left: 16px;
+    padding-right: 16px;
 }
 
 /* CARDS */
@@ -27,20 +28,20 @@ body {
     background: white;
     border-radius: 26px;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 10px 40px -10px rgba(15,23,42,0.06); /* Sombra más suave y extendida */
-    padding: 32px; /* Añadido padding para que los elementos internos no toquen el borde */
-    margin-bottom: 32px; /* Separación vertical entre tarjetas */
+    box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.06);
+    padding: 32px;
+    margin-bottom: 32px;
 }
 
 /* HERO TITLE */
 .title-main {
     font-size: 68px;
     font-weight: 900;
-    line-height: 1.15; /* Subido de 1 a 1.15 para que las líneas de texto no se aplasten */
+    line-height: 1.15;
     letter-spacing: -3px;
-    color: #2563eb; /* Actualizado al azul de tu imagen en lugar de negro */
+    color: #2563eb;
     max-width: 700px;
-    margin-bottom: 24px; /* Separación del subtítulo */
+    margin-bottom: 24px;
 }
 
 /* SECTION TITLES */
@@ -49,7 +50,7 @@ body {
     font-weight: 800;
     letter-spacing: -1px;
     color: #020617;
-    margin-bottom: 16px; /* Separación con su contenido inferior */
+    margin-bottom: 16px;
 }
 
 /* SUBTITLES */
@@ -58,12 +59,12 @@ body {
     font-size: 18px;
     line-height: 1.7;
     max-width: 760px;
-    margin-bottom: 32px; /* Espacio crucial para separar el texto de los botones */
+    margin-bottom: 32px;
 }
 
 /* BUTTONS */
 .btn-primary {
-    background: #2563eb; /* Azul para coincidir con tu imagen */
+    background: #2563eb;
     color: white;
     border: none;
     border-radius: 16px;
@@ -72,8 +73,8 @@ body {
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); /* Sombra para dar relieve */
-    margin-right: 12px; /* Separación entre botones */
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    margin-right: 12px;
     margin-bottom: 12px;
 }
 
@@ -84,16 +85,16 @@ body {
 }
 
 .btn-secondary {
-    background: white; /* Blanco limpio como en la imagen */
+    background: white;
     color: #334155;
-    border: 1px solid #cbd5e1; /* Borde sutil */
+    border: 1px solid #cbd5e1;
     border-radius: 16px;
     padding: 14px 24px;
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-right: 12px; /* Separación entre botones */
+    margin-right: 12px;
     margin-bottom: 12px;
 }
 
@@ -106,19 +107,18 @@ body {
 /* STATUS */
 .status-online {
     background: #dcfce7;
-    color: #166534; /* Verde más oscuro para mejorar lectura */
+    color: #166534;
     padding: 8px 18px;
     border-radius: 999px;
     font-size: 13px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
-    gap: 8px; /* Espacio para el punto verde */
-    margin-top: 16px; /* Lo separa del texto superior */
+    gap: 8px;
+    margin-top: 16px;
     border: 1px solid #bbf7d0;
 }
 
-/* Punto verde titilante para el estado online */
 .status-online::before {
     content: '';
     display: block;
@@ -140,10 +140,9 @@ body {
     background: #ffffff;
     border-radius: 20px;
     padding: 24px;
-    height: 100%;
     border: 1px solid #e2e8f0;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
-    margin-bottom: 16px; /* Separación por si se apilan verticalmente */
+    margin-bottom: 16px;
     transition: transform 0.2s;
 }
 
@@ -153,13 +152,14 @@ body {
 
 /* TABLE */
 .table-container {
-    background: transparent; /* Fondo transparente para que destaquen las filas */
+    background: transparent;
     border-radius: 22px;
-    overflow: hidden;
+    overflow-x: auto;
     display: flex;
     flex-direction: column;
-    gap: 12px; /* Esto da aire entre cada fila de la tabla */
+    gap: 12px;
     margin-top: 24px;
+    -webkit-overflow-scrolling: touch;
 }
 
 .table-header {
@@ -167,29 +167,31 @@ body {
     grid-template-columns: 2fr 1fr 1fr 1fr;
     padding: 16px 28px;
     background: #f1f5f9;
-    border-radius: 16px; /* Cabecera redondeada */
+    border-radius: 16px;
     font-size: 13px;
     font-weight: 700;
     color: #475569;
     text-transform: uppercase;
     letter-spacing: 1px;
+    min-width: 480px;
 }
 
 .table-row {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr;
     align-items: center;
-    padding: 20px 28px; /* Más espacio interno */
+    padding: 20px 28px;
     background: white;
-    border-radius: 16px; /* Cada fila se vuelve una "tarjeta" independiente */
+    border-radius: 16px;
     border: 1px solid #e2e8f0;
     font-size: 15px;
     transition: all 0.2s;
+    min-width: 480px;
 }
 
 .table-row:hover {
     border-color: #cbd5e1;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     transform: scale(1.01);
 }
 
@@ -218,18 +220,96 @@ body {
     font-size: 32px;
 }
 
-/* RESPONSIVE */
-@media(max-width:1200px) {
+/* ==============================
+   RESPONSIVE BREAKPOINTS
+   ============================== */
+
+/* Tablets grandes / laptops pequeñas */
+@media (max-width: 1200px) {
     .title-main {
         font-size: 54px;
     }
 }
 
-@media(max-width:900px) {
+/* Tablets */
+@media (max-width: 900px) {
     .title-main {
         font-size: 42px;
+        letter-spacing: -2px;
     }
+
     .title-section {
         font-size: 28px;
+    }
+
+    .container-dashboard {
+        width: 96%;
+        margin: 16px auto;
+    }
+
+    .card {
+        padding: 24px;
+        border-radius: 20px;
+    }
+}
+
+/* Móviles */
+@media (max-width: 640px) {
+    .title-main {
+        font-size: 32px;
+        letter-spacing: -1.5px;
+        margin-bottom: 16px;
+    }
+
+    .title-section {
+        font-size: 22px;
+    }
+
+    .subtitle {
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    .container-dashboard {
+        width: 100%;
+        margin: 8px auto;
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-bottom: 40px;
+    }
+
+    .card {
+        padding: 16px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+    }
+
+    .mini-card {
+        padding: 16px;
+        border-radius: 14px;
+        margin-bottom: 12px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 12px 20px;
+        font-size: 14px;
+        border-radius: 12px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .table-header,
+    .table-row {
+        font-size: 12px;
+        padding: 14px 16px;
+    }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 380px) {
+    .title-main {
+        font-size: 26px;
+        letter-spacing: -1px;
     }
 }

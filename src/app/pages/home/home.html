@@ -1,12 +1,26 @@
 <div class="minimal-wrapper">
-  
+
   <!-- Navegación -->
   <nav class="navbar">
     <div class="logo">
       <div class="logo-box">Q</div>
       <span class="logo-text">QoS Analytics</span>
     </div>
-    <div class="nav-links">
+
+    <!-- Botón hamburguesa (visible solo en móvil) -->
+    <button
+      class="menu-toggle"
+      [class.open]="menuOpen"
+      (click)="toggleMenu()"
+      aria-label="Abrir menú"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- Links de navegación -->
+    <div class="nav-links" [class.open]="menuOpen" (click)="closeMenu()">
       <a routerLink="/" class="nav-link active">Inicio</a>
       <a routerLink="/dashboard" class="nav-link">Monitoreo</a>
       <a routerLink="/dashboard" class="nav-link">Dashboard</a>
@@ -16,21 +30,18 @@
   <!-- Sección Principal -->
   <main class="hero-section">
     <div class="badge">Intelligent Network Monitoring</div>
-    
+
     <h1 class="hero-title">
       Análisis Estadístico y<br>
       <span class="text-gradient">QoS en Tiempo Real.</span>
     </h1>
-    
+
     <p class="hero-subtitle">
       Plataforma avanzada de monitoreo y simulación de tráfico de red utilizando análisis probabilístico, teoría de colas e inteligencia artificial.
     </p>
 
     <div class="hero-actions">
-      <!-- Este botón navega a la ruta del dashboard -->
       <button routerLink="/dashboard" class="btn btn-primary">Abrir Dashboard</button>
-      
-      <!-- Este botón ejecuta la función para abrir el repositorio -->
       <button (click)="abrirProyecto()" class="btn btn-secondary">Ver Proyecto</button>
     </div>
   </main>
