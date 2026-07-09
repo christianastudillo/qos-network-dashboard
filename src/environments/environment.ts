@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://127.0.0.1:8000',
+  apiUrl: 'https://qos-network-backend.onrender.com',
   firebase: {
     projectId: 'qos-network-dashboard',
     appId: '1:177678071674:web:416d473b61fb3eb081c8c3',
