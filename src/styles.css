@@ -1,4 +1,58 @@
-@import "tailwindcss";
+/*
+ * IMPORTANTE: @angular/build (el compilador de Angular 21) no soporta el
+ * escaneo de contenido de Tailwind v4 (@import "tailwindcss" + @source) —
+ * genera solo el theme/reset y ninguna clase de utilidad, aunque la CLI
+ * de Tailwind por separado sí funciona correctamente. Por eso Tailwind se
+ * compila aparte con `npm run build:css` (ver src/tailwind-entry.css) y
+ * aquí solo se importa el resultado ya generado como CSS estático.
+ * Si agregas clases de Tailwind nuevas en algún template, vuelve a correr
+ * `npm run build:css` para regenerar tailwind-generated.css.
+ */
+@import "./tailwind-generated.css";
+@import "leaflet/dist/leaflet.css";
+
+/* ============================
+   DESIGN TOKENS
+   Paleta única para toda la app (evita azules/cianes
+   distintos repetidos por componente).
+   ============================ */
+:root {
+    --color-primary: #2563eb;
+    --color-primary-dark: #1d4ed8;
+    --color-primary-darker: #1e3a8a;
+    --color-primary-light: #3b82f6;
+    --color-primary-soft: #eff6ff;
+    --color-primary-border: #bfdbfe;
+
+    --color-success: #10b981;
+    --color-success-soft: #dcfce7;
+    --color-success-border: #bbf7d0;
+    --color-success-text: #166534;
+
+    --color-warning: #f59e0b;
+    --color-warning-soft: #fffbeb;
+    --color-warning-border: #fde68a;
+    --color-warning-text: #92400e;
+
+    --color-danger: #ef4444;
+    --color-danger-soft: #fef2f2;
+    --color-danger-border: #fecaca;
+    --color-danger-text: #991b1b;
+
+    --color-text: #0f172a;
+    --color-text-muted: #64748b;
+    --color-text-subtle: #94a3b8;
+    --color-border: #e2e8f0;
+    --color-surface: #ffffff;
+    --color-bg: #f5f7fb;
+
+    /* Chrome oscuro compartido por sidebar/navbar del dashboard */
+    --chrome-bg: #0a1120;
+    --chrome-bg-soft: #0f172a;
+    --chrome-border: rgba(37, 99, 235, 0.18);
+    --chrome-text-muted: #64748b;
+    --chrome-text-subtle: #94a3b8;
+}
 
 /* ============================
    BASE
@@ -6,9 +60,9 @@
 html, body {
     margin: 0;
     padding: 0;
-    background: #f5f7fb;
+    background: var(--color-bg);
     font-family: Inter, Arial, Helvetica, sans-serif;
-    color: #0f172a;
+    color: var(--color-text);
     overflow-x: hidden;
 }
 
@@ -45,9 +99,9 @@ html, body {
    CARDS
    ============================ */
 .card {
-    background: white;
+    background: var(--color-surface);
     border-radius: 24px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-border);
     box-shadow: 0 4px 24px -8px rgba(15, 23, 42, 0.06);
     padding: 32px;
     margin-bottom: 28px;
@@ -57,10 +111,10 @@ html, body {
    MINI CARDS
    ============================ */
 .mini-card {
-    background: #ffffff;
+    background: var(--color-surface);
     border-radius: 18px;
     padding: 20px 24px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -78,7 +132,7 @@ html, body {
     font-weight: 900;
     line-height: 1.1;
     letter-spacing: -2px;
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, var(--color-primary-darker) 0%, var(--color-primary-light) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -89,12 +143,12 @@ html, body {
     font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.5px;
-    color: #0f172a;
+    color: var(--color-text);
     margin: 0 0 8px;
 }
 
 .subtitle {
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 16px;
     line-height: 1.65;
     margin: 0 0 24px;
@@ -105,7 +159,7 @@ html, body {
    los padres controlan el espaciado
    ============================ */
 .btn-primary {
-    background: #2563eb;
+    background: var(--color-primary);
     color: white;
     border: none;
     border-radius: 14px;
@@ -122,7 +176,7 @@ html, body {
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: #1d4ed8;
+    background: var(--color-primary-dark);
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(37, 99, 235, 0.38);
 }
@@ -155,12 +209,24 @@ html, body {
     transform: translateY(-1px);
 }
 
+.btn-icon-only {
+    padding: 10px 14px;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+/* Modificadores para anular el margen por defecto de .card/.mini-card
+   cuando el espaciado ya lo controla un grid/flex padre con gap. */
+.card--flush { margin-bottom: 0; }
+.mini-card--flush { margin-bottom: 0; }
+.subtitle--tight { margin: 0; }
+
 /* ============================
    STATUS BADGE
    ============================ */
 .status-online {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--color-success-soft);
+    color: var(--color-success-text);
     padding: 6px 14px;
     border-radius: 999px;
     font-size: 12px;
@@ -168,7 +234,7 @@ html, body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    border: 1px solid #bbf7d0;
+    border: 1px solid var(--color-success-border);
 }
 
 .status-online::before {
@@ -176,10 +242,41 @@ html, body {
     display: block;
     width: 7px;
     height: 7px;
-    background: #22c55e;
+    background: var(--color-success);
     border-radius: 50%;
     animation: pulse-status 2s infinite;
     flex-shrink: 0;
+}
+
+/* Variantes de estado reutilizables (reemplazan clases utilitarias repetidas inline) */
+.status-warning {
+    background: var(--color-warning-soft);
+    color: var(--color-warning-text);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid var(--color-warning-border);
+}
+
+.status-danger {
+    background: var(--color-danger-soft);
+    color: var(--color-danger-text);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid var(--color-danger-border);
+}
+
+.status-neutral {
+    background: #f1f5f9;
+    color: var(--color-text-muted);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid var(--color-border);
 }
 
 @keyframes pulse-status {
@@ -192,8 +289,8 @@ html, body {
    GLASS (stats-cards)
    ============================ */
 .glass {
-    background: white;
-    border: 1px solid #e2e8f0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
     box-shadow: 0 4px 20px -6px rgba(15, 23, 42, 0.06);
     transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -241,9 +338,9 @@ html, body {
     grid-template-columns: 2fr 1fr 1fr 1fr;
     align-items: center;
     padding: 18px 24px;
-    background: white;
+    background: var(--color-surface);
     border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-border);
     font-size: 14px;
     transition: all 0.2s;
     min-width: 460px;
@@ -261,13 +358,144 @@ html, body {
     width: 60px;
     height: 60px;
     border-radius: 16px;
-    background: #eff6ff;
-    color: #2563eb;
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 28px;
     flex-shrink: 0;
+}
+
+/* ============================
+   FORM FIELDS (login/registro, nombre de red)
+   ============================ */
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+
+.form-field label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+}
+
+.form-field .input,
+.input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.input.invalid {
+    border-color: var(--color-danger);
+}
+
+.form-error {
+    color: var(--color-danger-text);
+    font-size: 12.5px;
+    margin: -2px 0 0;
+}
+
+.form-alert {
+    background: var(--color-danger-soft);
+    border: 1px solid var(--color-danger-border);
+    color: var(--color-danger-text);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    margin-bottom: 16px;
+}
+
+/* ============================
+   TOAST
+   ============================ */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    box-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.35);
+    color: white;
+    max-width: 90vw;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.toast-success { background: var(--color-success); }
+.toast-error { background: var(--color-danger); }
+.toast-info { background: var(--color-primary-light); }
+
+/* ============================
+   LEAFLET — resetea el fondo/borde por defecto del divIcon
+   para que solo se vea nuestro pin SVG.
+   ============================ */
+.network-location-pin {
+    background: transparent;
+    border: none;
+}
+
+/* ============================
+   NETWORK PANEL — formulario/resumen de red + mapa, usado en
+   Dashboard e Historial Detail.
+   ============================ */
+.network-panel {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 28px;
+    align-items: stretch;
+}
+
+.network-panel__form {
+    display: flex;
+    flex-direction: column;
+}
+
+.network-panel__location {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+}
+
+.network-panel__map {
+    min-height: 240px;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+@media (max-width: 900px) {
+    .network-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .network-panel__map {
+        min-height: 220px;
+        order: -1;
+    }
 }
 
 /* ============================

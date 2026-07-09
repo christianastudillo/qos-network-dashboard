@@ -1,0 +1,78 @@
+<div class="dashboard-layout">
+
+  <app-sidebar [activeTab]="null"></app-sidebar>
+
+  <div class="dashboard-content">
+    <app-navbar activeTab="historial" [userEmail]="userEmail()" (logout)="logout()"></app-navbar>
+
+    <div class="container-dashboard">
+      @if (isLoading()) {
+        <div class="card text-center py-16 text-slate-400">
+          Cargando análisis...
+        </div>
+      } @else if (notFound()) {
+        <div class="card text-center py-16">
+          <p class="text-red-500 font-semibold mb-2">No se encontró este análisis.</p>
+          <a routerLink="/historial" class="text-blue-600 font-semibold">Volver al historial</a>
+        </div>
+      } @else if (record(); as r) {
+        <div class="mb-6">
+          <a routerLink="/historial" class="text-sm text-blue-600 font-semibold inline-flex items-center gap-1 mb-4">
+            <app-icon name="log-out" [size]="14" style="transform: rotate(180deg);"></app-icon>
+            Volver al historial
+          </a>
+          <p class="text-blue-600 font-bold uppercase tracking-widest mb-2 text-xs md:text-sm">
+            Análisis guardado · {{ r.createdAt | date:'medium' }}
+          </p>
+          <h1 class="title-main text-4xl md:text-5xl">{{ r.networkName }}</h1>
+        </div>
+
+        <div class="card network-panel mb-6">
+          <div class="network-panel__form">
+            <h2 class="title-section mb-4">Ubicación registrada</h2>
+            <div class="network-panel__location">
+              <app-icon name="map-pin" [size]="18" class="text-blue-600 shrink-0"></app-icon>
+              <span class="text-sm text-slate-600">{{ r.location?.address ?? 'Ubicación no registrada' }}</span>
+            </div>
+          </div>
+          <div class="network-panel__map">
+            <app-network-location-map [location]="r.location" [editable]="false"></app-network-location-map>
+          </div>
+        </div>
+
+        <app-stats-cards [liveMetrics]="r.liveMetrics"></app-stats-cards>
+
+        @if (r.statistics; as stats) {
+          <div class="card mt-6">
+            <h2 class="title-section mb-5">Estadísticas de la sesión</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+              <div class="mini-card">
+                <p class="text-slate-500 text-sm mb-2">Latencia promedio</p>
+                <p class="text-2xl font-black text-slate-900">{{ stats.latency_mean | number:'1.2-2' }} ms</p>
+                <p class="text-xs text-slate-400 mt-1">σ = {{ stats.latency_std_dev | number:'1.2-2' }}</p>
+              </div>
+              <div class="mini-card">
+                <p class="text-slate-500 text-sm mb-2">Jitter promedio</p>
+                <p class="text-2xl font-black text-slate-900">{{ stats.jitter_mean | number:'1.2-2' }} ms</p>
+              </div>
+              <div class="mini-card">
+                <p class="text-slate-500 text-sm mb-2">Throughput promedio</p>
+                <p class="text-2xl font-black text-slate-900">{{ stats.download_mean | number:'1.2-2' }} Mbps</p>
+              </div>
+              <div class="mini-card">
+                <p class="text-slate-500 text-sm mb-2">λ (tasa de llegada)</p>
+                <p class="text-2xl font-black text-slate-900">{{ stats.lambda_rate | number:'1.2-2' }}</p>
+                <p class="text-xs text-slate-400 mt-1">Tendencia: {{ stats.traffic_trend }}</p>
+              </div>
+            </div>
+          </div>
+        }
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <app-network-simulator [queueMetrics]="r.queue"></app-network-simulator>
+          <app-ai-recommendations [recommendationResponse]="r.recommendations" [isLoading]="false"></app-ai-recommendations>
+        </div>
+      }
+    </div>
+  </div>
+</div>

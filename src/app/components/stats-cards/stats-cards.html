@@ -1,25 +1,16 @@
 <div class="stats-grid">
   @for (metric of metrics; track metric.title) {
-    <div class="glass rounded-3xl card-hover relative overflow-hidden" style="padding: 20px 24px;">
-      <!-- Decoración de fondo -->
-      <div style="
-        position: absolute;
-        top: -30px;
-        right: -30px;
-        width: 100px;
-        height: 100px;
-        background: rgba(6, 182, 212, 0.08);
-        border-radius: 50%;
-        filter: blur(20px);
-        pointer-events: none;
-      "></div>
+    <div class="glass rounded-3xl card-hover stat-card">
+      <div class="stat-card__decoration"></div>
 
-      <div class="flex justify-between items-start" style="position:relative; z-index:1;">
+      <div class="flex justify-between items-start stat-card__content">
         <div>
           <p class="metric-lbl">{{ metric.title }}</p>
           <p class="metric-val">{{ metric.value }}</p>
         </div>
-        <div class="icon-bg">{{ metric.icon }}</div>
+        <div class="icon-bg">
+          <app-icon [name]="metric.icon" [size]="26"></app-icon>
+        </div>
       </div>
     </div>
   }

@@ -22,8 +22,13 @@
     <!-- Links de navegación -->
     <div class="nav-links" [class.open]="menuOpen" (click)="closeMenu()">
       <a routerLink="/" class="nav-link active">Inicio</a>
-      <a routerLink="/dashboard" class="nav-link">Monitoreo</a>
-      <a routerLink="/dashboard" class="nav-link">Dashboard</a>
+      @if (isLoggedIn()) {
+        <a routerLink="/dashboard" class="nav-link">Dashboard</a>
+        <a routerLink="/historial" class="nav-link">Historial</a>
+      } @else {
+        <a routerLink="/login" class="nav-link">Iniciar sesión</a>
+        <a routerLink="/registro" class="nav-link">Crear cuenta</a>
+      }
     </div>
   </nav>
 

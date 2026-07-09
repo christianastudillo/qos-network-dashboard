@@ -5,8 +5,8 @@
    ============================ */
 .minimal-wrapper {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #f8fafc;
-    color: #0f172a;
+    background: var(--color-bg);
+    color: var(--color-text);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -25,7 +25,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.25rem 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--color-border);
     position: relative;
 }
 
@@ -38,7 +38,7 @@
 }
 
 .logo-box {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, var(--color-primary-darker) 0%, var(--color-primary-light) 100%);
     color: #fff;
     width: 36px;
     height: 36px;
@@ -55,7 +55,7 @@
 .logo-text {
     font-weight: 800;
     font-size: 1.05rem;
-    color: #0f172a;
+    color: var(--color-text);
     letter-spacing: -0.02em;
 }
 
@@ -80,7 +80,7 @@
     display: block;
     width: 22px;
     height: 2px;
-    background: #0f172a;
+    background: var(--color-text);
     border-radius: 2px;
     transition: all 0.3s ease;
 }
@@ -97,14 +97,14 @@
 
 .nav-link {
     text-decoration: none;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-weight: 600;
     font-size: 0.9rem;
     transition: color 0.2s ease;
 }
 
-.nav-link:hover { color: #2563eb; }
-.nav-link.active { color: #2563eb; font-weight: 700; }
+.nav-link:hover { color: var(--color-primary); }
+.nav-link.active { color: var(--color-primary); font-weight: 700; }
 
 /* ============================
    HERO
@@ -121,9 +121,9 @@
 }
 
 .badge {
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    color: #1d4ed8;
+    background: var(--color-primary-soft);
+    border: 1px solid var(--color-primary-border);
+    color: var(--color-primary-dark);
     padding: 0.45rem 1.1rem;
     border-radius: 999px;
     font-size: 0.8rem;
@@ -139,11 +139,11 @@
     line-height: 1.08;
     letter-spacing: -0.04em;
     margin: 0 0 1.25rem;
-    color: #0f172a;
+    color: var(--color-text);
 }
 
 .text-gradient {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, var(--color-primary-darker) 0%, var(--color-primary-light) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -151,7 +151,7 @@
 
 .hero-subtitle {
     font-size: 1.15rem;
-    color: #64748b;
+    color: var(--color-text-muted);
     line-height: 1.65;
     max-width: 600px;
     margin: 0 0 2.5rem;
@@ -179,13 +179,13 @@
 }
 
 .btn-primary {
-    background: #2563eb;
+    background: var(--color-primary);
     color: white;
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.36);
 }
 
 .btn-primary:hover {
-    background: #1d4ed8;
+    background: var(--color-primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(37, 99, 235, 0.28);
 }
@@ -198,7 +198,7 @@
 
 .btn-secondary:hover {
     background: #f1f5f9;
-    color: #0f172a;
+    color: var(--color-text);
     transform: translateY(-2px);
 }
 
@@ -232,7 +232,7 @@
 .metric-value {
     font-size: 2.5rem;
     font-weight: 900;
-    color: #0f172a;
+    color: var(--color-text);
     margin: 0 0 0.4rem;
     letter-spacing: -0.04em;
     line-height: 1;
@@ -240,20 +240,20 @@
 
 .metric-symbol {
     font-size: 1.25rem;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-weight: 700;
 }
 
 .metric-label {
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: var(--color-text-subtle);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin: 0;
 }
 
-.text-accent { color: #2563eb; }
+.text-accent { color: var(--color-primary); }
 
 /* ============================
    RESPONSIVE
@@ -279,7 +279,7 @@
         left: -1.5rem;
         right: -1.5rem;
         background: white;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--color-border);
         border-radius: 16px;
         padding: 0.75rem;
         box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.1);
@@ -295,8 +295,8 @@
         color: #334155;
     }
 
-    .nav-link:hover { background: #f1f5f9; color: #2563eb; }
-    .nav-link.active { background: #eff6ff; color: #2563eb; }
+    .nav-link:hover { background: #f1f5f9; color: var(--color-primary); }
+    .nav-link.active { background: var(--color-primary-soft); color: var(--color-primary); }
 
     .hero-title { font-size: 2.6rem; letter-spacing: -0.03em; }
     .hero-subtitle { font-size: 1rem; }

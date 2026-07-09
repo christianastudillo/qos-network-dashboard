@@ -1,30 +1,27 @@
 <nav class="qos-navbar">
 
-  <!-- Logo -->
-  <div class="qos-navbar__logo">
-    <div class="qos-navbar__logo-box">Q</div>
-    <div class="qos-navbar__logo-text">
-      <span class="qos-navbar__logo-title">QoS Analytics</span>
-      <span class="qos-navbar__logo-sub">Intelligent Network Monitoring</span>
-    </div>
+  <!-- Título de la sección activa (la navegación real vive en el sidebar) -->
+  <div class="qos-navbar__title">
+    <h2>{{ sectionTitle }}</h2>
   </div>
 
-  <!-- Botón hamburguesa (móvil) -->
-  <button
-    class="qos-navbar__toggle"
-    [class.open]="menuOpen"
-    (click)="toggleMenu()"
-    aria-label="Abrir menú"
-  >
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-
-  <!-- Links -->
-  <div class="qos-navbar__links" [class.open]="menuOpen" (click)="closeMenu()">
-    <a routerLink="/" class="qos-navbar__link">Inicio</a>
-    <a routerLink="/dashboard" class="qos-navbar__link">Dashboard</a>
+  <!-- Menú de usuario -->
+  <div class="qos-navbar__user">
+    @if (userEmail) {
+      <div class="qos-navbar__user-chip">
+        <app-icon name="user" [size]="16"></app-icon>
+        <span>{{ userEmail }}</span>
+      </div>
+      <button
+        type="button"
+        class="qos-navbar__logout"
+        (click)="logout.emit()"
+        aria-label="Cerrar sesión"
+        title="Cerrar sesión"
+      >
+        <app-icon name="log-out" [size]="18"></app-icon>
+      </button>
+    }
   </div>
 
 </nav>

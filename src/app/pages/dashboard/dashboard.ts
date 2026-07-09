@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { firstValueFrom, Subscription, timer } from 'rxjs';
 
@@ -9,9 +11,14 @@ import { NetworkSimulatorComponent } from '../../components/network-simulator/ne
 import { AiRecommendationsComponent } from '../../components/ai-recommendations/ai-recommendations';
 import { SidebarComponent } from '../../components/sidebar/sidebar';
 import { NavbarComponent } from '../../components/navbar/navbar';
+import { IconComponent } from '../../components/icon/icon';
+import { NetworkLocationMapComponent } from '../../components/network-location-map/network-location-map';
 
 import { NetworkApiService } from '../../services/network-api.service';
 import { NetworkMeasurementService } from '../../services/network-measurement.service';
+import { GeolocationService } from '../../services/geolocation.service';
+import { AuthService } from '../../services/auth.service';
+import { AnalysisHistoryService } from '../../services/analysis-history.service';
 
 import {
   LiveMetricsResponse,
@@ -20,6 +27,10 @@ import {
   QueueRealtimeResponse,
   RecommendationResponse
 } from '../../models/network.models';
+import { NetworkLocation } from '../../models/network-location.model';
+import { AnalysisRecord } from '../../models/analysis-record.model';
+
+const AUTOSAVE_INTERVAL_MS = 5 * 60 * 1000;
 
 type DashboardTab = 'dashboard' | 'estadisticas' | 'reportes';
 type Timeframe = 'dia' | 'semana' | 'mes';
@@ -29,12 +40,15 @@ type Timeframe = 'dia' | 'semana' | 'mes';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     StatsCardsComponent,
     ChartsComponent,
     NetworkSimulatorComponent,
     AiRecommendationsComponent,
     SidebarComponent,
     NavbarComponent,
+    IconComponent,
+    NetworkLocationMapComponent,
   ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
@@ -61,25 +75,104 @@ export class DashboardComponent implements OnInit, OnDestroy {
   queueMetrics = signal<QueueRealtimeResponse | null>(null);
   recommendations = signal<RecommendationResponse | null>(null);
 
+  networkName = signal<string>('');
+  location = signal<NetworkLocation | null>(null);
+  isLocating = signal(false);
+
   toastMessage = signal<string | null>(null);
   toastType = signal<'success' | 'info' | 'error'>('info');
 
   private dataStreamSubscription?: Subscription;
+  private autosaveSubscription?: Subscription;
+
+  userEmail = computed(() => this.authService.currentUser()?.email ?? null);
 
   constructor(
     private readonly networkMeasurementService: NetworkMeasurementService,
-    private readonly networkApiService: NetworkApiService
+    private readonly networkApiService: NetworkApiService,
+    private readonly geolocationService: GeolocationService,
+    private readonly authService: AuthService,
+    private readonly analysisHistoryService: AnalysisHistoryService,
+    private readonly router: Router
   ) {}
+
+  async logout(): Promise<void> {
+    await this.authService.logout();
+    this.router.navigateByUrl('/');
+  }
 
   ngOnInit(): void {
     this.sessionId.set(this.networkMeasurementService.getSessionId());
     this.dataStreamSubscription = timer(0, 15000).subscribe(() => {
       this.runNetworkTestAndRefresh(false);
     });
+    this.detectLocation();
+
+    this.autosaveSubscription = timer(AUTOSAVE_INTERVAL_MS, AUTOSAVE_INTERVAL_MS).subscribe(() => {
+      this.autosaveAnalysis();
+    });
   }
 
   ngOnDestroy(): void {
     this.dataStreamSubscription?.unsubscribe();
+    this.autosaveSubscription?.unsubscribe();
+  }
+
+  private async autosaveAnalysis(): Promise<void> {
+    const uid = this.authService.currentUser()?.uid;
+    const name = this.networkName().trim();
+    const metrics = this.liveMetrics();
+
+    if (!uid || !name || !metrics) {
+      return;
+    }
+
+    const stats = this.statistics();
+    const queue = this.queueMetrics();
+    const recommendations = this.recommendations();
+
+    const record: Omit<AnalysisRecord, 'id'> = {
+      uid,
+      networkName: name,
+      location: this.location(),
+      sessionId: this.sessionId(),
+      createdAt: new Date().toISOString(),
+      liveMetrics: metrics,
+      statistics: stats ? {
+        latency_mean: stats.latency_stats.mean,
+        latency_std_dev: stats.latency_stats.std_dev,
+        jitter_mean: stats.jitter_stats.mean,
+        download_mean: stats.download_stats.mean,
+        lambda_rate: stats.lambda_rate,
+        traffic_trend: stats.traffic_trend,
+      } : null,
+      queue,
+      recommendations,
+    };
+
+    try {
+      await this.analysisHistoryService.saveSnapshot(record);
+      this.showToast(`Análisis de "${name}" guardado en tu historial`, 'success');
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async detectLocation(): Promise<void> {
+    this.isLocating.set(true);
+    try {
+      const location = await this.geolocationService.locateAndDescribe();
+      this.location.set(location);
+    } catch {
+      // Ubicación no disponible o permiso denegado: el usuario puede
+      // seguir usando el dashboard sin ubicación asignada.
+    } finally {
+      this.isLocating.set(false);
+    }
+  }
+
+  onLocationChange(location: NetworkLocation): void {
+    this.location.set(location);
   }
 
   setTab(tab: DashboardTab): void {
@@ -178,10 +271,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getGeneralStatusClass(): string {
     const status = this.getGeneralStatus();
-    if (status === 'ESTABLE') return 'status-online text-xs';
-    if (status === 'ADVERTENCIA' || status === 'ALTA_UTILIZACION') return 'bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full font-bold text-xs';
-    if (status === 'INESTABLE') return 'bg-red-100 text-red-700 px-3 py-1 rounded-full font-bold text-xs';
-    return 'bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-bold text-xs';
+    if (status === 'ESTABLE') return 'status-online';
+    if (status === 'ADVERTENCIA' || status === 'ALTA_UTILIZACION') return 'status-warning';
+    if (status === 'INESTABLE') return 'status-danger';
+    return 'status-neutral';
   }
 
   getLatencyStatus(): string {

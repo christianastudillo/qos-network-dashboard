@@ -1,26 +1,3 @@
-/* Dark mode overrides — se activan si el padre tiene clase .dark */
-:host-context(.dark) .card {
-    background: #1e293b;
-    border-color: #334155;
-}
-
-:host-context(.dark) .mini-card {
-    background: #0f172a;
-    border-color: #334155;
-}
-
-:host-context(.dark) .table-header {
-    background: #0f172a;
-    color: #94a3b8;
-}
-
-:host-context(.dark) .table-row {
-    background: #1e293b;
-    border-color: #334155;
-    color: #cbd5e1;
-}
-
-:host-context(.dark) .table-row:hover {
-    background: #0f172a;
-    border-color: #475569;
-}
+/* Estilos específicos de DashboardComponent — el resto vive en las clases
+   globales (.card, .mini-card, .btn-primary, .network-panel*, etc.)
+   definidas en styles.css */

@@ -12,14 +12,16 @@
   [class.hidden-fab]="sidebarOpen"
   aria-label="Abrir menú"
 >
-  ☰
+  <app-icon name="menu" [size]="20"></app-icon>
 </button>
 
 <!-- Sidebar principal -->
 <div class="sidebar-panel" [class.open]="sidebarOpen">
 
   <!-- Botón cerrar (móvil) -->
-  <button class="sidebar-close" (click)="closeSidebar()" aria-label="Cerrar menú">✕</button>
+  <button class="sidebar-close" (click)="closeSidebar()" aria-label="Cerrar menú">
+    <app-icon name="x" [size]="18"></app-icon>
+  </button>
 
   <!-- LOGO -->
   <div class="sidebar-logo">
@@ -33,30 +35,27 @@
   <!-- MENU -->
   <nav class="sidebar-nav">
 
-    <div class="sidebar-nav__item active">
-      <span class="sidebar-nav__icon">📊</span>
-      <span>Dashboard</span>
-    </div>
+    @for (item of tabItems; track item.tab) {
+      <button
+        type="button"
+        class="sidebar-nav__item"
+        [class.active]="activeTab === item.tab"
+        (click)="selectTab(item.tab)"
+      >
+        <app-icon [name]="item.icon" [size]="18" class="sidebar-nav__icon"></app-icon>
+        <span>{{ item.label }}</span>
+      </button>
+    }
 
-    <div class="sidebar-nav__item">
-      <span class="sidebar-nav__icon">📈</span>
-      <span>Estadísticas</span>
-    </div>
-
-    <div class="sidebar-nav__item">
-      <span class="sidebar-nav__icon">🌐</span>
-      <span>Tráfico de Red</span>
-    </div>
-
-    <div class="sidebar-nav__item">
-      <span class="sidebar-nav__icon">⚡</span>
-      <span>Simulación M/M/1</span>
-    </div>
-
-    <div class="sidebar-nav__item">
-      <span class="sidebar-nav__icon">📑</span>
-      <span>Reportes</span>
-    </div>
+    <a
+      routerLink="/historial"
+      routerLinkActive="active"
+      class="sidebar-nav__item"
+      (click)="closeSidebar()"
+    >
+      <app-icon name="archive" [size]="18" class="sidebar-nav__icon"></app-icon>
+      <span>Historial</span>
+    </a>
 
   </nav>
 

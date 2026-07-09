@@ -6,110 +6,64 @@
     background: rgba(15, 23, 42, 0.92);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(6, 182, 212, 0.12);
+    border-bottom: 1px solid var(--chrome-border);
     position: sticky;
     top: 0;
     z-index: 50;
     min-height: 64px;
 }
 
-/* Logo */
-.qos-navbar__logo {
+.qos-navbar__title h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.01em;
+}
+
+.qos-navbar__user {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    z-index: 101;
-    flex-shrink: 0;
 }
 
-.qos-navbar__logo-box {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: #06b6d4;
+.qos-navbar__user-chip {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: 900;
-    color: white;
-    box-shadow: 0 0 14px rgba(6, 182, 212, 0.4);
-    flex-shrink: 0;
-}
-
-.qos-navbar__logo-text {
-    display: flex;
-    flex-direction: column;
-}
-
-.qos-navbar__logo-title {
-    font-size: 1rem;
-    font-weight: 900;
-    color: #06b6d4;
-    line-height: 1.2;
-}
-
-.qos-navbar__logo-sub {
-    font-size: 0.68rem;
-    color: #64748b;
-    line-height: 1;
-}
-
-/* Hamburguesa — oculto en desktop */
-.qos-navbar__toggle {
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    gap: 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    z-index: 101;
-    border-radius: 8px;
-    transition: background 0.2s;
-}
-
-.qos-navbar__toggle:hover {
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
     background: rgba(255, 255, 255, 0.06);
-}
-
-.qos-navbar__toggle span {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background: #94a3b8;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-}
-
-.qos-navbar__toggle.open span:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
-    background: #06b6d4;
-}
-.qos-navbar__toggle.open span:nth-child(2) { opacity: 0; }
-.qos-navbar__toggle.open span:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
-    background: #06b6d4;
-}
-
-/* Links */
-.qos-navbar__links {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-}
-
-.qos-navbar__link {
-    text-decoration: none;
-    color: #94a3b8;
-    font-size: 0.9rem;
+    color: #cbd5e1;
+    font-size: 0.82rem;
     font-weight: 600;
-    transition: color 0.2s ease;
+    max-width: 220px;
 }
 
-.qos-navbar__link:hover {
-    color: #06b6d4;
+.qos-navbar__user-chip span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.qos-navbar__logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: none;
+    border: 1px solid var(--chrome-border);
+    color: var(--chrome-text-subtle);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.qos-navbar__logout:hover {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #f87171;
 }
 
 /* ============================
@@ -118,60 +72,13 @@
 @media (max-width: 768px) {
     .qos-navbar {
         padding: 0.875rem 1.25rem;
-        flex-wrap: wrap;
     }
 
-    .qos-navbar__toggle {
-        display: flex;
-    }
-
-    .qos-navbar__logo-sub {
-        display: none;
-    }
-
-    .qos-navbar__links {
-        display: none;
-        flex-direction: column;
-        gap: 0;
-        width: 100%;
-        margin-top: 0.875rem;
-        background: rgba(15, 23, 42, 0.98);
-        border: 1px solid rgba(6, 182, 212, 0.15);
-        border-radius: 12px;
-        padding: 0.625rem;
-        box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.4);
-    }
-
-    .qos-navbar__links.open {
-        display: flex;
-    }
-
-    .qos-navbar__link {
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
+    .qos-navbar__title h2 {
         font-size: 0.95rem;
-        width: 100%;
-        color: #cbd5e1;
     }
 
-    .qos-navbar__link:hover {
-        background: rgba(6, 182, 212, 0.08);
-        color: #06b6d4;
-    }
-}
-
-@media (max-width: 480px) {
-    .qos-navbar {
-        padding: 0.75rem 1rem;
-    }
-
-    .qos-navbar__logo-box {
-        width: 34px;
-        height: 34px;
-        font-size: 1rem;
-    }
-
-    .qos-navbar__logo-title {
-        font-size: 0.875rem;
+    .qos-navbar__user-chip {
+        display: none;
     }
 }

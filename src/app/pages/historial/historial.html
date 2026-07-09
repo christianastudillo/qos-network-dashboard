@@ -1,0 +1,84 @@
+<div class="dashboard-layout">
+
+  <app-sidebar [activeTab]="null"></app-sidebar>
+
+  <div class="dashboard-content">
+    <app-navbar activeTab="historial" [userEmail]="userEmail()" (logout)="logout()"></app-navbar>
+
+    <div class="container-dashboard">
+      <div class="mb-8">
+        <p class="text-blue-600 font-bold uppercase tracking-widest mb-3 text-xs md:text-sm">
+          Tus análisis guardados
+        </p>
+        <h1 class="title-main text-4xl md:text-5xl">Historial</h1>
+        <p class="subtitle">Consulta los análisis de red que se han guardado automáticamente en tu cuenta.</p>
+      </div>
+
+      @if (isLoading()) {
+        <div class="card text-center py-16 text-slate-400">
+          Cargando historial...
+        </div>
+      } @else if (errorMessage()) {
+        <div class="card text-center py-16">
+          <p class="text-red-500 font-semibold">{{ errorMessage() }}</p>
+        </div>
+      } @else if (records().length === 0) {
+        <div class="card text-center py-16">
+          <app-icon name="archive" [size]="40" class="text-slate-300 mx-auto mb-4"></app-icon>
+          <p class="text-slate-500 font-semibold mb-1">Aún no tienes análisis guardados</p>
+          <p class="text-slate-400 text-sm">
+            Ve al <a routerLink="/dashboard" class="text-blue-600 font-semibold">Dashboard</a>,
+            asígnale un nombre a tu red y espera unos minutos: se guardará automáticamente aquí.
+          </p>
+        </div>
+      } @else {
+        <div class="history-grid">
+          @for (record of records(); track record.id) {
+            <a class="card history-card" [routerLink]="['/historial', record.id]">
+              <div class="history-card__header">
+                <div>
+                  <h2 class="title-section mb-1">{{ record.networkName }}</h2>
+                  <p class="text-xs text-slate-400">{{ record.createdAt | date:'medium' }}</p>
+                </div>
+                <button
+                  type="button"
+                  class="history-card__delete"
+                  (click)="deleteRecord(record.id, $event)"
+                  [disabled]="deletingId() === record.id"
+                  aria-label="Eliminar análisis"
+                  title="Eliminar"
+                >
+                  <app-icon name="trash-2" [size]="16"></app-icon>
+                </button>
+              </div>
+
+              <div class="history-card__location">
+                <app-icon name="map-pin" [size]="15"></app-icon>
+                <span>{{ record.location?.address ?? 'Ubicación no registrada' }}</span>
+              </div>
+
+              <div class="history-card__stats">
+                <div>
+                  <p class="text-xs text-slate-400">Latencia</p>
+                  <p class="font-bold text-slate-800">{{ record.liveMetrics?.latency_ms ?? 0 | number:'1.1-1' }} ms</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">Jitter</p>
+                  <p class="font-bold text-slate-800">{{ record.liveMetrics?.jitter_ms ?? 0 | number:'1.1-1' }} ms</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">Pérdida</p>
+                  <p class="font-bold text-slate-800">{{ record.liveMetrics?.packet_loss_pct ?? 0 | number:'1.1-1' }}%</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">Throughput</p>
+                  <p class="font-bold text-slate-800">{{ record.liveMetrics?.download_mbps ?? 0 | number:'1.1-1' }} Mbps</p>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

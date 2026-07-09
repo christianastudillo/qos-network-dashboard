@@ -1,36 +1,36 @@
-<div class="card p-6 md:p-10 h-full dark:bg-slate-800 dark:border-slate-700">
-  <h1 class="title-section text-xl md:text-2xl mb-6 dark:text-white">
+<div class="card p-6 md:p-10 h-full">
+  <h1 class="title-section text-xl md:text-2xl mb-6">
     Modelo M/M/1
   </h1>
 
   @if (queueMetrics; as q) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-      <div class="mini-card p-5 dark:bg-slate-900/50 dark:border-slate-700">
-        <p class="text-slate-500 dark:text-slate-400 text-sm">Tasa de llegada λ</p>
+      <div class="mini-card p-5">
+        <p class="text-slate-500 text-sm">Tasa de llegada λ</p>
         <h2 class="text-3xl font-black text-blue-600 mt-3">
           {{ q.lambda_rate | number:'1.2-2' }}
         </h2>
         <p class="text-xs text-slate-500 mt-2">solicitudes/s</p>
       </div>
 
-      <div class="mini-card p-5 dark:bg-slate-900/50 dark:border-slate-700">
-        <p class="text-slate-500 dark:text-slate-400 text-sm">Tasa de servicio μ</p>
+      <div class="mini-card p-5">
+        <p class="text-slate-500 text-sm">Tasa de servicio μ</p>
         <h2 class="text-3xl font-black text-green-600 mt-3">
           {{ q.mu_rate | number:'1.2-2' }}
         </h2>
         <p class="text-xs text-slate-500 mt-2">solicitudes/s</p>
       </div>
 
-      <div class="mini-card p-5 dark:bg-slate-900/50 dark:border-slate-700">
-        <p class="text-slate-500 dark:text-slate-400 text-sm">Utilización ρ</p>
+      <div class="mini-card p-5">
+        <p class="text-slate-500 text-sm">Utilización ρ</p>
         <h2 class="text-3xl font-black text-yellow-600 mt-3">
           {{ q.rho_pct | number:'1.2-2' }}%
         </h2>
         <p class="text-xs text-slate-500 mt-2">{{ q.stability_status }}</p>
       </div>
 
-      <div class="mini-card p-5 dark:bg-slate-900/50 dark:border-slate-700">
-        <p class="text-slate-500 dark:text-slate-400 text-sm">Tiempo en cola Wq</p>
+      <div class="mini-card p-5">
+        <p class="text-slate-500 text-sm">Tiempo en cola Wq</p>
         <h2 class="text-3xl font-black text-red-600 mt-3">
           {{ q.wq_ms | number:'1.2-2' }} ms
         </h2>
@@ -38,11 +38,11 @@
       </div>
     </div>
 
-    <div class="mt-6 p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300">
+    <div class="mt-6 p-5 rounded-2xl bg-slate-50 text-slate-600">
       {{ q.analysis_message }}
     </div>
   } @else {
-    <div class="text-center py-12 text-slate-500 dark:text-slate-400">
+    <div class="text-center py-12 text-slate-500">
       Ejecuta una medición para calcular el modelo M/M/1.
     </div>
   }

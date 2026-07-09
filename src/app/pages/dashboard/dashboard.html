@@ -2,24 +2,21 @@
 <div class="dashboard-layout">
 
   <!-- SIDEBAR -->
-  <app-sidebar></app-sidebar>
+  <app-sidebar [activeTab]="activeTab()" (tabChange)="setTab($event)"></app-sidebar>
 
   <!-- NAVBAR + CONTENIDO -->
   <div class="dashboard-content">
 
     <!-- NAVBAR SUPERIOR -->
-    <app-navbar></app-navbar>
+    <app-navbar [activeTab]="activeTab()" [userEmail]="userEmail()" (logout)="logout()"></app-navbar>
 
     <!-- CONTENIDO DEL DASHBOARD -->
     <div class="container-dashboard">
 
       <!-- TOAST -->
       @if (toastMessage()) {
-        <div
-          class="fixed bottom-5 right-5 z-50 flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl text-white max-w-[90vw]"
-          [style.background-color]="toastType() === 'success' ? '#10b981' : toastType() === 'error' ? '#ef4444' : '#3b82f6'"
-        >
-          <span>{{ toastType() === 'success' ? '✅' : toastType() === 'error' ? '⚠️' : 'ℹ️' }}</span>
+        <div class="toast" [class]="'toast-' + toastType()">
+          <app-icon [name]="toastType() === 'success' ? 'check-circle' : toastType() === 'error' ? 'alert-triangle' : 'info'" [size]="18"></app-icon>
           <p class="font-semibold text-sm m-0">{{ toastMessage() }}</p>
         </div>
       }
@@ -66,11 +63,11 @@
 
         <!-- ESTADO GENERAL -->
         <div class="col-span-1 lg:col-span-4 mt-2 lg:mt-0">
-          <div class="card" style="margin-bottom: 0;">
+          <div class="card card--flush">
             <div class="flex justify-between items-start gap-4 mb-6">
               <div>
                 <p class="text-slate-500 text-sm mb-1">Estado General</p>
-                <h2 class="text-3xl font-black text-slate-900 dark:text-white mt-1">
+                <h2 class="text-3xl font-black text-slate-900 mt-1">
                   {{ getGeneralStatus() }}
                 </h2>
               </div>
@@ -78,11 +75,11 @@
             </div>
 
             <div class="grid grid-cols-2 gap-3 mb-5">
-              <div class="mini-card" style="margin-bottom:0;">
+              <div class="mini-card mini-card--flush">
                 <p class="text-slate-500 text-xs mb-1">Sesión</p>
                 <p class="text-xl font-black text-slate-900">{{ getShortSessionId() }}</p>
               </div>
-              <div class="mini-card" style="margin-bottom:0;">
+              <div class="mini-card mini-card--flush">
                 <p class="text-slate-500 text-xs mb-1">Muestras</p>
                 <p class="text-xl font-black text-slate-900">{{ history()?.total_points ?? 0 }}</p>
               </div>
@@ -104,6 +101,60 @@
         @case ('dashboard') {
           <div [@tabAnimation]>
 
+            <!-- RED ANALIZADA: nombre + ubicación -->
+            <div class="card network-panel">
+              <div class="network-panel__form">
+                <h2 class="title-section mb-1">Red analizada</h2>
+                <p class="text-slate-500 text-sm mb-5">
+                  Asigna un nombre a la red que estás midiendo y confirma su ubicación.
+                </p>
+
+                <div class="form-field">
+                  <label for="networkName">Nombre de la red</label>
+                  <input
+                    id="networkName"
+                    type="text"
+                    class="input"
+                    placeholder="Ej. WiFi Casa, Oficina Piso 3..."
+                    [ngModel]="networkName()"
+                    (ngModelChange)="networkName.set($event)"
+                    maxlength="60"
+                  />
+                </div>
+
+                <div class="network-panel__location">
+                  <app-icon name="map-pin" [size]="18" class="text-blue-600 shrink-0"></app-icon>
+                  <span class="text-sm text-slate-600">
+                    {{ location()?.address ?? (isLocating() ? 'Detectando ubicación...' : 'Ubicación no detectada') }}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  class="btn-secondary mt-4"
+                  (click)="detectLocation()"
+                  [disabled]="isLocating()"
+                >
+                  <app-icon name="crosshair" [size]="16"></app-icon>
+                  <span class="ml-2">{{ isLocating() ? 'Detectando...' : 'Detectar ubicación' }}</span>
+                </button>
+
+                @if (networkName().trim().length === 0) {
+                  <p class="text-xs text-slate-400 mt-3">
+                    Asigna un nombre para que este análisis se guarde en tu historial.
+                  </p>
+                }
+              </div>
+
+              <div class="network-panel__map">
+                <app-network-location-map
+                  [location]="location()"
+                  [editable]="true"
+                  (locationChange)="onLocationChange($event)"
+                ></app-network-location-map>
+              </div>
+            </div>
+
             <!-- STATS CARDS -->
             <app-stats-cards [liveMetrics]="liveMetrics()"></app-stats-cards>
 
@@ -112,7 +163,7 @@
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
                   <h2 class="title-section">Traffic Analytics</h2>
-                  <p class="subtitle" style="margin:0;">Historial real enviado al backend.</p>
+                  <p class="subtitle subtitle--tight">Historial real enviado al backend.</p>
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
                   <button
@@ -125,7 +176,7 @@
                   >Sem.</button>
                 </div>
               </div>
-              <div class="bg-slate-50 rounded-2xl p-4 w-full" style="height: 280px;">
+              <div class="bg-slate-50 rounded-2xl p-4 w-full h-[280px]">
                 <app-charts [history]="history()?.points ?? []"></app-charts>
               </div>
             </div>
@@ -135,7 +186,7 @@
 
               <!-- TABLA MÉTRICAS -->
               <div class="col-span-1 lg:col-span-7">
-                <div class="card" style="height:100%; margin-bottom:0;">
+                <div class="card card--flush h-full">
                   <div class="flex justify-between items-center gap-4 mb-6">
                     <div>
                       <h2 class="title-section">Métricas de Rendimiento</h2>
@@ -143,10 +194,10 @@
                     </div>
                     <button
                       (click)="refreshData()"
-                      class="btn-secondary"
-                      style="padding: 10px 14px; font-size: 18px; border-radius: 12px; flex-shrink:0;"
+                      class="btn-secondary btn-icon-only"
                       [disabled]="isRunningTest()"
-                    >↻</button>
+                      aria-label="Actualizar métricas"
+                    ><app-icon name="refresh-cw" [size]="18"></app-icon></button>
                   </div>
 
                   @if (liveMetrics(); as metrics) {
@@ -192,31 +243,31 @@
 
               <!-- RESUMEN -->
               <div class="col-span-1 lg:col-span-5">
-                <div class="card" style="height:100%; margin-bottom:0;">
+                <div class="card card--flush h-full">
                   <h2 class="title-section mb-5">Resumen General</h2>
                   <div class="flex flex-col gap-4">
-                    <div class="mini-card flex justify-between items-center" style="margin-bottom:0;">
+                    <div class="mini-card mini-card--flush flex justify-between items-center">
                       <div>
                         <p class="text-slate-500 text-xs mb-1">Disponibilidad estimada</p>
                         <p class="text-3xl font-black text-slate-900">{{ getAvailability() }}%</p>
                       </div>
-                      <span class="text-4xl">🌐</span>
+                      <app-icon name="globe" [size]="32" class="text-blue-500"></app-icon>
                     </div>
-                    <div class="mini-card flex justify-between items-center" style="margin-bottom:0;">
+                    <div class="mini-card mini-card--flush flex justify-between items-center">
                       <div>
                         <p class="text-slate-500 text-xs mb-1">Probabilidad de congestión</p>
                         <p class="text-3xl font-black text-slate-900">{{ queueMetrics()?.congestion_probability_pct ?? 0 | number:'1.2-2' }}%</p>
                       </div>
-                      <span class="text-4xl">📊</span>
+                      <app-icon name="bar-chart" [size]="32" class="text-blue-500"></app-icon>
                     </div>
-                    <div class="mini-card flex justify-between items-center" style="margin-bottom:0;">
+                    <div class="mini-card mini-card--flush flex justify-between items-center">
                       <div>
                         <p class="text-slate-500 text-xs mb-1">Última actualización</p>
                         <p class="text-base font-black text-slate-900">
                           {{ liveMetrics()?.last_updated ? (liveMetrics()?.last_updated | date:'short') : 'Sin datos' }}
                         </p>
                       </div>
-                      <span class="text-4xl">⏱️</span>
+                      <app-icon name="clock" [size]="32" class="text-blue-500"></app-icon>
                     </div>
                   </div>
                 </div>
@@ -243,22 +294,22 @@
 
             @if (statistics(); as stats) {
               <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
-                <div class="mini-card" style="margin-bottom:0;">
+                <div class="mini-card mini-card--flush">
                   <p class="text-slate-500 text-sm mb-2">Latencia promedio</p>
                   <p class="text-2xl font-black text-slate-900">{{ stats.latency_stats.mean | number:'1.2-2' }} ms</p>
                   <p class="text-xs text-slate-400 mt-1">σ = {{ stats.latency_stats.std_dev | number:'1.2-2' }}</p>
                 </div>
-                <div class="mini-card" style="margin-bottom:0;">
+                <div class="mini-card mini-card--flush">
                   <p class="text-slate-500 text-sm mb-2">Jitter promedio</p>
                   <p class="text-2xl font-black text-slate-900">{{ stats.jitter_stats.mean | number:'1.2-2' }} ms</p>
                   <p class="text-xs text-slate-400 mt-1">σ = {{ stats.jitter_stats.std_dev | number:'1.2-2' }}</p>
                 </div>
-                <div class="mini-card" style="margin-bottom:0;">
+                <div class="mini-card mini-card--flush">
                   <p class="text-slate-500 text-sm mb-2">Throughput promedio</p>
                   <p class="text-2xl font-black text-slate-900">{{ stats.download_stats.mean | number:'1.2-2' }} Mbps</p>
                   <p class="text-xs text-slate-400 mt-1">Mediana = {{ stats.download_stats.median | number:'1.2-2' }}</p>
                 </div>
-                <div class="mini-card" style="margin-bottom:0;">
+                <div class="mini-card mini-card--flush">
                   <p class="text-slate-500 text-sm mb-2">λ (tasa de llegada)</p>
                   <p class="text-2xl font-black text-slate-900">{{ stats.lambda_rate | number:'1.2-2' }}</p>
                   <p class="text-xs text-slate-400 mt-1">solicitudes/s</p>

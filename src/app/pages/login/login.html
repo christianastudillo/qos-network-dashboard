@@ -1,0 +1,58 @@
+<div class="auth-shell">
+  <div class="auth-card card">
+    <div class="auth-logo">
+      <div class="auth-logo__box">Q</div>
+      <div>
+        <h1 class="auth-logo__title">QoS Analytics</h1>
+        <p class="auth-logo__sub">Intelligent Network Monitoring</p>
+      </div>
+    </div>
+
+    <h2 class="title-section mb-1">Iniciar sesión</h2>
+    <p class="subtitle mb-6">Ingresa con tu cuenta para ver tus análisis guardados.</p>
+
+    @if (errorMessage()) {
+      <div class="form-alert">{{ errorMessage() }}</div>
+    }
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label for="email">Correo electrónico</label>
+        <input
+          id="email"
+          type="email"
+          class="input"
+          autocomplete="email"
+          placeholder="tucorreo@ejemplo.com"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          name="email"
+          required
+        />
+      </div>
+
+      <div class="form-field">
+        <label for="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          class="input"
+          autocomplete="current-password"
+          placeholder="••••••••"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          name="password"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn-primary w-full mt-2" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      ¿No tienes cuenta? <a routerLink="/registro">Crea una aquí</a>
+    </p>
+  </div>
+</div>

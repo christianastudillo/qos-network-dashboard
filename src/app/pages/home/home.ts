@@ -1,5 +1,7 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
+
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -9,6 +11,10 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['./home.css']
 })
 export class HomeComponent {
+
+  isLoggedIn = computed(() => !!this.authService.currentUser());
+
+  constructor(private readonly authService: AuthService) {}
 
   menuOpen = false;
 

@@ -1,0 +1,9 @@
+/*
+ * Punto de entrada SOLO para el CLI de Tailwind (npm run build:css).
+ * No lo importa Angular directamente: @angular/build no soporta el
+ * escaneo de contenido de Tailwind v4 (@source), así que este archivo
+ * se compila por separado con la CLI real de Tailwind y el resultado
+ * (tailwind-generated.css) es el que se importa en styles.css.
+ */
+@import "tailwindcss";
+@source "./app";
