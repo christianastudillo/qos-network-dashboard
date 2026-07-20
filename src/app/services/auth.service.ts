@@ -87,6 +87,17 @@ export class AuthService {
     await signOut(auth);
   }
 
+  /** Token de Firebase para autenticar peticiones al backend. null si no hay sesión activa. */
+  async getIdToken(): Promise<string | null> {
+    const user = this.currentUser();
+
+    if (!user) {
+      return null;
+    }
+
+    return user.getIdToken();
+  }
+
   private translateError(error: unknown): string {
     const code = (error as { code?: string })?.code ?? '';
     return ERROR_MESSAGES[code] ?? 'Ocurrió un error inesperado. Intenta de nuevo.';
