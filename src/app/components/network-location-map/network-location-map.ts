@@ -56,7 +56,7 @@ export class NetworkLocationMapComponent implements AfterViewInit, OnChanges, On
       return;
     }
 
-    const L = await import('leaflet');
+    const L = (await import('leaflet')).default;
     const startLocation = this.location ?? { lat: -0.1807, lng: -78.4678 }; // Quito, Ecuador (default)
 
     this.map = L.map(this.mapEl.nativeElement, {
@@ -101,7 +101,7 @@ export class NetworkLocationMapComponent implements AfterViewInit, OnChanges, On
       return;
     }
 
-    const L = await import('leaflet');
+    const L = (await import('leaflet')).default;
     this.setMarker(this.location.lat, this.location.lng, L);
     this.map.setView([this.location.lat, this.location.lng], 15);
   }
