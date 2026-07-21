@@ -7,7 +7,10 @@ import { AuthService } from '../services/auth.service';
 
 /** Adjunta el ID token de Firebase a las peticiones dirigidas al backend propio. */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  if (!req.url.startsWith(environment.apiUrl)) {
+  const apiUrl = environment.apiUrl;
+  const isOwnApiRequest = req.url === apiUrl || req.url.startsWith(`${apiUrl}/`);
+
+  if (!isOwnApiRequest) {
     return next(req);
   }
 
