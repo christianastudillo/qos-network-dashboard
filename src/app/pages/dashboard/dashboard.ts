@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  effect,
+  signal
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -56,12 +63,17 @@ type Timeframe = 'dia' | 'semana' | 'mes';
     trigger('tabAnimation', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(12px)' }),
-        animate('350ms cubic-bezier(0.4, 0, 0.2, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+        animate(
+          '350ms cubic-bezier(0.4, 0, 0.2, 1)',
+          style({ opacity: 1, transform: 'translateY(0)' })
+        )
       ])
     ])
   ]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  private readonly networkNameStorageKey = 'qos_network_name';
+
   activeTab = signal<DashboardTab>('dashboard');
   chartTimeframe = signal<Timeframe>('dia');
   sessionId = signal<string>('');
@@ -75,7 +87,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   queueMetrics = signal<QueueRealtimeResponse | null>(null);
   recommendations = signal<RecommendationResponse | null>(null);
 
-  networkName = signal<string>('');
+  private readonly initialNetworkName = this.getStoredNetworkName();
+
+  networkName = signal<string>(this.initialNetworkName);
+  networkNameDraft = signal<string>(this.initialNetworkName);
+  isEditingNetworkName = signal<boolean>(
+    this.initialNetworkName.trim().length === 0
+  );
+
   location = signal<NetworkLocation | null>(null);
   isLocating = signal(false);
 
@@ -94,7 +113,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private readonly authService: AuthService,
     private readonly analysisHistoryService: AnalysisHistoryService,
     private readonly router: Router
-  ) {}
+  ) {
+    effect(() => {
+      const name = this.networkName();
+
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      try {
+        if (name.trim()) {
+          localStorage.setItem(this.networkNameStorageKey, name);
+        } else {
+          localStorage.removeItem(this.networkNameStorageKey);
+        }
+      } catch (error) {
+        console.warn('No se pudo guardar el nombre de la red:', error);
+      }
+    });
+  }
 
   async logout(): Promise<void> {
     await this.authService.logout();
@@ -103,12 +140,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.sessionId.set(this.networkMeasurementService.getSessionId());
+
     this.dataStreamSubscription = timer(0, 15000).subscribe(() => {
       this.runNetworkTestAndRefresh(false);
     });
+
     this.detectLocation();
 
-    this.autosaveSubscription = timer(AUTOSAVE_INTERVAL_MS, AUTOSAVE_INTERVAL_MS).subscribe(() => {
+    this.autosaveSubscription = timer(
+      AUTOSAVE_INTERVAL_MS,
+      AUTOSAVE_INTERVAL_MS
+    ).subscribe(() => {
       this.autosaveAnalysis();
     });
   }
@@ -116,6 +158,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.dataStreamSubscription?.unsubscribe();
     this.autosaveSubscription?.unsubscribe();
+  }
+
+  private getStoredNetworkName(): string {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+
+    try {
+      return localStorage.getItem(this.networkNameStorageKey) ?? '';
+    } catch {
+      return '';
+    }
   }
 
   private async autosaveAnalysis(): Promise<void> {
@@ -138,21 +192,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
       sessionId: this.sessionId(),
       createdAt: new Date().toISOString(),
       liveMetrics: metrics,
-      statistics: stats ? {
-        latency_mean: stats.latency_stats.mean,
-        latency_std_dev: stats.latency_stats.std_dev,
-        jitter_mean: stats.jitter_stats.mean,
-        download_mean: stats.download_stats.mean,
-        lambda_rate: stats.lambda_rate,
-        traffic_trend: stats.traffic_trend,
-      } : null,
+      statistics: stats
+        ? {
+          latency_mean: stats.latency_stats.mean,
+          latency_std_dev: stats.latency_stats.std_dev,
+          jitter_mean: stats.jitter_stats.mean,
+          download_mean: stats.download_stats.mean,
+          lambda_rate: stats.lambda_rate,
+          traffic_trend: stats.traffic_trend,
+        }
+        : null,
       queue,
       recommendations,
     };
 
     try {
       await this.analysisHistoryService.saveSnapshot(record);
-      this.showToast(`Análisis de "${name}" guardado en tu historial`, 'success');
+
+      this.showToast(
+        `Análisis de "${name}" guardado en tu historial`,
+        'success'
+      );
     } catch (error) {
       console.error(error);
     }
@@ -160,12 +220,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   async detectLocation(): Promise<void> {
     this.isLocating.set(true);
+
     try {
       const location = await this.geolocationService.locateAndDescribe();
       this.location.set(location);
     } catch {
-      // Ubicación no disponible o permiso denegado: el usuario puede
-      // seguir usando el dashboard sin ubicación asignada.
+      // La aplicación continúa funcionando aunque no se conceda ubicación.
     } finally {
       this.isLocating.set(false);
     }
@@ -188,19 +248,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.runNetworkTestAndRefresh(true);
   }
 
-  async runNetworkTestAndRefresh(showSuccessToast = true): Promise<void> {
-    if (this.isRunningTest()) return;
+  async runNetworkTestAndRefresh(
+    showSuccessToast = true
+  ): Promise<void> {
+    if (this.isRunningTest()) {
+      return;
+    }
+
     this.isRunningTest.set(true);
 
     try {
       await this.networkMeasurementService.runNetworkTest();
       await this.loadBackendResults();
+
       if (showSuccessToast) {
-        this.showToast('Métricas reales actualizadas desde el backend', 'success');
+        this.showToast(
+          'Métricas reales actualizadas desde el backend',
+          'success'
+        );
       }
     } catch (error) {
       console.error(error);
-      this.showToast('No se pudo conectar con el backend. Verifica que FastAPI esté encendido.', 'error');
+
+      this.showToast(
+        'No se pudo conectar con el backend. Verifica que FastAPI esté encendido.',
+        'error'
+      );
     } finally {
       this.isRunningTest.set(false);
     }
@@ -208,16 +281,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   async refreshRecommendations(): Promise<void> {
     const currentSessionId = this.sessionId();
-    if (!currentSessionId) return;
+
+    if (!currentSessionId) {
+      return;
+    }
 
     this.isLoadingRecommendations.set(true);
+
     try {
-      const result = await firstValueFrom(this.networkApiService.getRecommendations(currentSessionId));
+      const result = await firstValueFrom(
+        this.networkApiService.getRecommendations(currentSessionId)
+      );
+
       this.recommendations.set(result);
       this.showToast('Recomendaciones actualizadas', 'success');
     } catch (error) {
       console.error(error);
-      this.showToast('No existen datos suficientes para generar recomendaciones.', 'error');
+
+      this.showToast(
+        'No existen datos suficientes para generar recomendaciones.',
+        'error'
+      );
     } finally {
       this.isLoadingRecommendations.set(false);
     }
@@ -225,13 +309,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private async loadBackendResults(): Promise<void> {
     const id = this.sessionId();
-    const [live, history, statistics, queueMetrics, recommendations] = await Promise.all([
+
+    const [
+      live,
+      history,
+      statistics,
+      queueMetrics,
+      recommendations
+    ] = await Promise.all([
       firstValueFrom(this.networkApiService.getLiveMetrics(id)),
       firstValueFrom(this.networkApiService.getMetricsHistory(id)),
       firstValueFrom(this.networkApiService.getStatistics(id)),
       firstValueFrom(this.networkApiService.getQueueMetrics(id)),
       firstValueFrom(this.networkApiService.getRecommendations(id)),
     ]);
+
     this.liveMetrics.set(live);
     this.history.set(history);
     this.statistics.set(statistics);
@@ -239,30 +331,80 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.recommendations.set(recommendations);
   }
 
-  showToast(message: string, type: 'success' | 'info' | 'error'): void {
+  showToast(
+    message: string,
+    type: 'success' | 'info' | 'error'
+  ): void {
     this.toastMessage.set(message);
     this.toastType.set(type);
-    setTimeout(() => this.toastMessage.set(null), 3500);
+
+    setTimeout(() => {
+      this.toastMessage.set(null);
+    }, 3500);
   }
 
   exportData(): void {
     const historyPoints = this.history()?.points ?? [];
+
     if (historyPoints.length === 0) {
-      this.showToast('No hay historial disponible para exportar.', 'info');
+      this.showToast(
+        'No hay historial disponible para exportar.',
+        'info'
+      );
       return;
     }
-    const headers = ['timestamp','latency_ms','jitter_ms','download_mbps','upload_mbps','packet_loss_pct','failed_requests','total_requests'].join(',');
-    const rows = historyPoints.map(p => [p.timestamp, p.latency_ms, p.jitter_ms, p.download_mbps, p.upload_mbps ?? '', p.packet_loss_pct, p.failed_requests, p.total_requests].join(','));
-    const blob = new Blob([headers + '\n' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+
+    const headers = [
+      'timestamp',
+      'latency_ms',
+      'jitter_ms',
+      'download_mbps',
+      'upload_mbps',
+      'packet_loss_pct',
+      'failed_requests',
+      'total_requests'
+    ].join(',');
+
+    const rows = historyPoints.map((point) =>
+      [
+        point.timestamp,
+        point.latency_ms,
+        point.jitter_ms,
+        point.download_mbps,
+        point.upload_mbps ?? '',
+        point.packet_loss_pct,
+        point.failed_requests,
+        point.total_requests
+      ].join(',')
+    );
+
+    const blob = new Blob(
+      [headers + '\n' + rows.join('\n')],
+      {
+        type: 'text/csv;charset=utf-8;'
+      }
+    );
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
+
     link.setAttribute('href', url);
-    link.setAttribute('download', `reporte_qos_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute(
+      'download',
+      `reporte_qos_${new Date().toISOString().slice(0, 10)}.csv`
+    );
+
     link.style.visibility = 'hidden';
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    this.showToast('Archivo CSV descargado correctamente', 'success');
+    URL.revokeObjectURL(url);
+
+    this.showToast(
+      'Archivo CSV descargado correctamente',
+      'success'
+    );
   }
 
   getGeneralStatus(): string {
@@ -271,40 +413,128 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getGeneralStatusClass(): string {
     const status = this.getGeneralStatus();
-    if (status === 'ESTABLE') return 'status-online';
-    if (status === 'ADVERTENCIA' || status === 'ALTA_UTILIZACION') return 'status-warning';
-    if (status === 'INESTABLE') return 'status-danger';
+
+    if (status === 'ESTABLE') {
+      return 'status-online';
+    }
+
+    if (
+      status === 'ADVERTENCIA' ||
+      status === 'ALTA_UTILIZACION'
+    ) {
+      return 'status-warning';
+    }
+
+    if (status === 'INESTABLE') {
+      return 'status-danger';
+    }
+
     return 'status-neutral';
   }
 
   getLatencyStatus(): string {
-    const v = this.liveMetrics()?.latency_ms ?? 0;
-    return v <= 50 ? 'Óptimo' : v <= 120 ? 'Moderado' : 'Crítico';
+    const value = this.liveMetrics()?.latency_ms ?? 0;
+
+    return value <= 50
+      ? 'Óptimo'
+      : value <= 120
+        ? 'Moderado'
+        : 'Crítico';
   }
 
   getPacketLossStatus(): string {
-    const v = this.liveMetrics()?.packet_loss_pct ?? 0;
-    return v <= 2 ? 'Bajo' : v <= 5 ? 'Moderado' : 'Alto';
+    const value = this.liveMetrics()?.packet_loss_pct ?? 0;
+
+    return value <= 2
+      ? 'Bajo'
+      : value <= 5
+        ? 'Moderado'
+        : 'Alto';
   }
 
   getJitterStatus(): string {
-    const v = this.liveMetrics()?.jitter_ms ?? 0;
-    return v <= 10 ? 'Óptimo' : v <= 30 ? 'Moderado' : 'Crítico';
+    const value = this.liveMetrics()?.jitter_ms ?? 0;
+
+    return value <= 10
+      ? 'Óptimo'
+      : value <= 30
+        ? 'Moderado'
+        : 'Crítico';
   }
 
   getStatusTextClass(status: string): string {
-    if (status === 'Óptimo' || status === 'Bajo') return 'text-green-600 font-bold';
-    if (status === 'Moderado') return 'text-yellow-500 font-bold';
+    if (
+      status === 'Óptimo' ||
+      status === 'Bajo'
+    ) {
+      return 'text-green-600 font-bold';
+    }
+
+    if (status === 'Moderado') {
+      return 'text-yellow-500 font-bold';
+    }
+
     return 'text-red-500 font-bold';
   }
 
   getAvailability(): string {
     const loss = this.liveMetrics()?.packet_loss_pct ?? 0;
+
     return Math.max(0, 100 - loss).toFixed(2);
   }
 
   getShortSessionId(): string {
     const id = this.sessionId();
+
     return id ? id.slice(0, 8) : 'N/A';
+  }
+
+  confirmNetworkName(): void {
+    const newName = this.networkNameDraft().trim();
+
+    if (!newName) {
+      this.showToast(
+        'Debes ingresar un nombre para la red.',
+        'error'
+      );
+      return;
+    }
+
+    const previousName = this.networkName().trim();
+    const networkChanged =
+      previousName.length > 0 &&
+      previousName !== newName;
+
+    if (networkChanged) {
+      const newSessionId =
+        this.networkMeasurementService.startNewSession();
+
+      this.sessionId.set(newSessionId);
+      this.clearCurrentAnalysis();
+    }
+
+    this.networkName.set(newName);
+    this.networkNameDraft.set(newName);
+    this.isEditingNetworkName.set(false);
+
+    this.showToast(
+      networkChanged
+        ? `Red actualizada a "${newName}". Se inició una nueva sesión.`
+        : `Red "${newName}" confirmada.`,
+      'success'
+    );
+  }
+
+  editNetworkName(): void {
+    this.networkNameDraft.set(this.networkName());
+    this.isEditingNetworkName.set(true);
+  }
+
+  private clearCurrentAnalysis(): void {
+    this.liveMetrics.set(null);
+    this.history.set(null);
+    this.statistics.set(null);
+    this.queueMetrics.set(null);
+    this.recommendations.set(null);
   }
 }
