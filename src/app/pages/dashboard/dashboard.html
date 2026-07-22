@@ -102,26 +102,43 @@
             </p>
 
             <div class="form-field">
-              <label for="networkName">Nombre de la red</label>
+              <label for="networkName">
+                Nombre de la red
+              </label>
+
+              @if (networkChangePending()) {
+              <p class="network-change-message">
+                Se cambió de red. Ingresa el nombre de la nueva red.
+              </p>
+              }
 
               @if (isEditingNetworkName()) {
-              <div class="flex items-stretch gap-2">
-                <input id="networkName" type="text" class="input flex-1" placeholder="Ej. WiFi Casa, Oficina Piso 3..."
-                  [ngModel]="networkNameDraft()" (ngModelChange)="networkNameDraft.set($event)"
-                  (keyup.enter)="confirmNetworkName()" maxlength="60" />
+              <div class="network-name-control" [class.network-name-control--change]="networkChangePending()">
+                <input id="networkName" type="text" class="input" [placeholder]="
+          networkChangePending()
+            ? 'Escribe el nombre de la nueva red...'
+            : 'Ej. WiFi Casa, Oficina Piso 3...'
+        " [ngModel]="networkNameDraft()" (ngModelChange)="networkNameDraft.set($event)"
+                  (keyup.enter)="confirmNetworkName()" [attr.aria-invalid]="networkChangePending()" maxlength="60" />
 
-                <button type="button" class="btn-primary shrink-0" (click)="confirmNetworkName()"
-                  [disabled]="networkNameDraft().trim().length === 0">
-                  Confirmar
+                <button type="button" class="btn-primary network-name-action" (click)="confirmNetworkName()" [disabled]="
+          networkNameDraft().trim().length === 0 ||
+          isSavingNetworkName()
+        ">
+                  {{
+                  isSavingNetworkName()
+                  ? 'Guardando...'
+                  : 'Confirmar'
+                  }}
                 </button>
               </div>
               } @else {
-              <div class="flex items-stretch gap-2">
-                <div class="input flex-1 flex items-center font-semibold text-slate-800">
+              <div class="network-name-control">
+                <div class="input network-name-confirmed">
                   {{ networkName() }}
                 </div>
 
-                <button type="button" class="btn-secondary shrink-0" (click)="editNetworkName()">
+                <button type="button" class="btn-secondary network-name-action" (click)="editNetworkName()">
                   Editar
                 </button>
               </div>
