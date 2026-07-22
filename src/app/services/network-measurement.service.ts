@@ -10,7 +10,7 @@ import { MeasurementPayload, MeasurementResponse } from '../models/network.model
 export class NetworkMeasurementService {
   private readonly sessionStorageKey = 'qos_network_session_id';
 
-  constructor(private readonly networkApiService: NetworkApiService) {}
+  constructor(private readonly networkApiService: NetworkApiService) { }
 
   getSessionId(): string {
     const existingSessionId = localStorage.getItem(this.sessionStorageKey);
@@ -159,5 +159,16 @@ export class NetworkMeasurementService {
       navigatorWithConnection.connection?.type ||
       'unknown'
     );
+  }
+
+  startNewSession(): string {
+    const newSessionId = crypto.randomUUID();
+
+    localStorage.setItem(
+      this.sessionStorageKey,
+      newSessionId
+    );
+
+    return newSessionId;
   }
 }

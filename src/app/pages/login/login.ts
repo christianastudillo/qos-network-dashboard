@@ -14,7 +14,9 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
   email = signal('');
   password = signal('');
+
   isSubmitting = signal(false);
+  isGoogleSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
 
   constructor(
@@ -24,6 +26,10 @@ export class LoginComponent {
   ) {}
 
   async onSubmit(): Promise<void> {
+    if (this.isSubmitting() || this.isGoogleSubmitting()) {
+      return;
+    }
+
     if (!this.email().trim() || !this.password()) {
       this.errorMessage.set('Ingresa tu correo y contraseña.');
       return;
@@ -33,13 +39,42 @@ export class LoginComponent {
     this.errorMessage.set(null);
 
     try {
-      await this.authService.login(this.email().trim(), this.password());
-      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/dashboard';
-      this.router.navigateByUrl(returnUrl);
+      await this.authService.login(
+        this.email().trim(),
+        this.password()
+      );
+
+      await this.navigateAfterLogin();
     } catch (error) {
       this.errorMessage.set((error as Error).message);
     } finally {
       this.isSubmitting.set(false);
     }
+  }
+
+  async onGoogleLogin(): Promise<void> {
+    if (this.isSubmitting() || this.isGoogleSubmitting()) {
+      return;
+    }
+
+    this.isGoogleSubmitting.set(true);
+    this.errorMessage.set(null);
+
+    try {
+      await this.authService.loginWithGoogle();
+      await this.navigateAfterLogin();
+    } catch (error) {
+      this.errorMessage.set((error as Error).message);
+    } finally {
+      this.isGoogleSubmitting.set(false);
+    }
+  }
+
+  private async navigateAfterLogin(): Promise<void> {
+    const returnUrl =
+      this.route.snapshot.queryParamMap.get('returnUrl') ??
+      '/dashboard';
+
+    await this.router.navigateByUrl(returnUrl);
   }
 }

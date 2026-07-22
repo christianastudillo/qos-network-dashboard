@@ -13,6 +13,18 @@ const ERROR_MESSAGES: Record<string, string> = {
   'auth/email-already-in-use': 'Ya existe una cuenta con ese correo.',
   'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
   'auth/too-many-requests': 'Demasiados intentos. Intenta de nuevo más tarde.',
+  'auth/popup-closed-by-user':
+    'Cerraste la ventana de Google antes de completar el inicio de sesión.',
+  'auth/popup-blocked':
+    'El navegador bloqueó la ventana de inicio de sesión de Google.',
+  'auth/cancelled-popup-request':
+    'La solicitud de inicio de sesión con Google fue cancelada.',
+  'auth/account-exists-with-different-credential':
+    'Ya existe una cuenta con este correo usando otro método de inicio de sesión.',
+  'auth/unauthorized-domain':
+    'Este dominio no está autorizado en Firebase Authentication.',
+  'auth/operation-not-allowed':
+    'El inicio de sesión con Google no está habilitado en Firebase.'
 };
 
 @Injectable({
@@ -22,7 +34,6 @@ export class AuthService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
 
-  /** null = sin verificar todavía, undefined-like inicial hasta que Firebase resuelva el estado */
   currentUser = signal<User | null>(null);
   authReady = signal(false);
 
@@ -37,10 +48,11 @@ export class AuthService {
     }
   }
 
-  private async getAuthModule() {
+  private async getAuthModule(): Promise<typeof import('firebase/auth')> {
     if (!this.authModulePromise) {
       this.authModulePromise = import('firebase/auth');
     }
+
     return this.authModulePromise;
   }
 
@@ -49,23 +61,73 @@ export class AuthService {
       const { getAuth } = await this.getAuthModule();
       this.authInstance = getAuth(getFirebaseApp());
     }
+
     return this.authInstance;
   }
 
   private async initAuthState(): Promise<void> {
-    const { onAuthStateChanged } = await this.getAuthModule();
-    const auth = await this.getAuthInstance();
-    onAuthStateChanged(auth, (user) => {
-      this.currentUser.set(user);
+    try {
+      const { onAuthStateChanged } = await this.getAuthModule();
+      const auth = await this.getAuthInstance();
+
+      onAuthStateChanged(
+        auth,
+        (user) => {
+          this.currentUser.set(user);
+          this.authReady.set(true);
+        },
+        (error) => {
+          console.error('Error comprobando la sesión de Firebase:', error);
+          this.currentUser.set(null);
+          this.authReady.set(true);
+        }
+      );
+    } catch (error) {
+      console.error('Error inicializando Firebase Authentication:', error);
+      this.currentUser.set(null);
       this.authReady.set(true);
-    });
+    }
   }
 
   async login(email: string, password: string): Promise<void> {
     const { signInWithEmailAndPassword } = await this.getAuthModule();
     const auth = await this.getAuthInstance();
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const credential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      this.currentUser.set(credential.user);
+    } catch (error) {
+      throw new Error(this.translateError(error));
+    }
+  }
+
+  async loginWithGoogle(): Promise<void> {
+    if (!this.isBrowser) {
+      throw new Error(
+        'El inicio de sesión con Google solo está disponible en el navegador.'
+      );
+    }
+
+    const {
+      GoogleAuthProvider,
+      signInWithPopup
+    } = await this.getAuthModule();
+
+    const auth = await this.getAuthInstance();
+    const provider = new GoogleAuthProvider();
+
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
+
+    try {
+      const credential = await signInWithPopup(auth, provider);
+      this.currentUser.set(credential.user);
     } catch (error) {
       throw new Error(this.translateError(error));
     }
@@ -74,8 +136,15 @@ export class AuthService {
   async register(email: string, password: string): Promise<void> {
     const { createUserWithEmailAndPassword } = await this.getAuthModule();
     const auth = await this.getAuthInstance();
+
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const credential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      this.currentUser.set(credential.user);
     } catch (error) {
       throw new Error(this.translateError(error));
     }
@@ -84,10 +153,11 @@ export class AuthService {
   async logout(): Promise<void> {
     const { signOut } = await this.getAuthModule();
     const auth = await this.getAuthInstance();
+
     await signOut(auth);
+    this.currentUser.set(null);
   }
 
-  /** Token de Firebase para autenticar peticiones al backend. null si no hay sesión activa. */
   async getIdToken(): Promise<string | null> {
     const user = this.currentUser();
 
@@ -100,6 +170,10 @@ export class AuthService {
 
   private translateError(error: unknown): string {
     const code = (error as { code?: string })?.code ?? '';
-    return ERROR_MESSAGES[code] ?? 'Ocurrió un error inesperado. Intenta de nuevo.';
+
+    return (
+      ERROR_MESSAGES[code] ??
+      'Ocurrió un error inesperado. Intenta de nuevo.'
+    );
   }
 }

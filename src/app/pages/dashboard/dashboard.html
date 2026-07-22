@@ -15,10 +15,12 @@
 
       <!-- TOAST -->
       @if (toastMessage()) {
-        <div class="toast" [class]="'toast-' + toastType()">
-          <app-icon [name]="toastType() === 'success' ? 'check-circle' : toastType() === 'error' ? 'alert-triangle' : 'info'" [size]="18"></app-icon>
-          <p class="font-semibold text-sm m-0">{{ toastMessage() }}</p>
-        </div>
+      <div class="toast" [class]="'toast-' + toastType()">
+        <app-icon
+          [name]="toastType() === 'success' ? 'check-circle' : toastType() === 'error' ? 'alert-triangle' : 'info'"
+          [size]="18"></app-icon>
+        <p class="font-semibold text-sm m-0">{{ toastMessage() }}</p>
+      </div>
       }
 
       <!-- HEADER -->
@@ -33,29 +35,23 @@
           </h1>
 
           <p class="subtitle">
-            Mide la red real desde Angular, envía las mediciones a FastAPI y calcula métricas QoS, estadística, teoría de colas M/M/1 y recomendaciones AI.
+            Mide la red real desde Angular, envía las mediciones a FastAPI y calcula métricas QoS, estadística, teoría
+            de colas M/M/1 y recomendaciones AI.
           </p>
 
           <!-- TABS -->
           <div class="flex flex-wrap gap-2 mt-6">
-            <button
-              (click)="setTab('dashboard')"
-              [class]="activeTab() === 'dashboard' ? 'btn-primary' : 'btn-secondary'"
-            >
+            <button (click)="setTab('dashboard')"
+              [class]="activeTab() === 'dashboard' ? 'btn-primary' : 'btn-secondary'">
               Dashboard
             </button>
 
-            <button
-              (click)="setTab('estadisticas')"
-              [class]="activeTab() === 'estadisticas' ? 'btn-primary' : 'btn-secondary'"
-            >
+            <button (click)="setTab('estadisticas')"
+              [class]="activeTab() === 'estadisticas' ? 'btn-primary' : 'btn-secondary'">
               Estadísticas
             </button>
 
-            <button
-              (click)="setTab('reportes')"
-              [class]="activeTab() === 'reportes' ? 'btn-primary' : 'btn-secondary'"
-            >
+            <button (click)="setTab('reportes')" [class]="activeTab() === 'reportes' ? 'btn-primary' : 'btn-secondary'">
               Reportes
             </button>
           </div>
@@ -85,11 +81,7 @@
               </div>
             </div>
 
-            <button
-              (click)="refreshData()"
-              class="btn-primary w-full"
-              [disabled]="isRunningTest()"
-            >
+            <button (click)="refreshData()" class="btn-primary w-full" [disabled]="isRunningTest()">
               {{ isRunningTest() ? 'Midiendo red...' : 'Medir red ahora' }}
             </button>
           </div>
@@ -98,249 +90,245 @@
 
       <!-- TAB: DASHBOARD -->
       @switch (activeTab()) {
-        @case ('dashboard') {
-          <div [@tabAnimation]>
+      @case ('dashboard') {
+      <div [@tabAnimation]>
 
-            <!-- RED ANALIZADA: nombre + ubicación -->
-            <div class="card network-panel">
-              <div class="network-panel__form">
-                <h2 class="title-section mb-1">Red analizada</h2>
-                <p class="text-slate-500 text-sm mb-5">
-                  Asigna un nombre a la red que estás midiendo y confirma su ubicación.
-                </p>
+        <!-- RED ANALIZADA: nombre + ubicación -->
+        <div class="card network-panel">
+          <div class="network-panel__form">
+            <h2 class="title-section mb-1">Red analizada</h2>
+            <p class="text-slate-500 text-sm mb-5">
+              Asigna un nombre a la red que estás midiendo y confirma su ubicación.
+            </p>
 
-                <div class="form-field">
-                  <label for="networkName">Nombre de la red</label>
-                  <input
-                    id="networkName"
-                    type="text"
-                    class="input"
-                    placeholder="Ej. WiFi Casa, Oficina Piso 3..."
-                    [ngModel]="networkName()"
-                    (ngModelChange)="networkName.set($event)"
-                    maxlength="60"
-                  />
-                </div>
+            <div class="form-field">
+              <label for="networkName">Nombre de la red</label>
 
-                <div class="network-panel__location">
-                  <app-icon name="map-pin" [size]="18" class="text-blue-600 shrink-0"></app-icon>
-                  <span class="text-sm text-slate-600">
-                    {{ location()?.address ?? (isLocating() ? 'Detectando ubicación...' : 'Ubicación no detectada') }}
-                  </span>
-                </div>
+              @if (isEditingNetworkName()) {
+              <div class="flex items-stretch gap-2">
+                <input id="networkName" type="text" class="input flex-1" placeholder="Ej. WiFi Casa, Oficina Piso 3..."
+                  [ngModel]="networkNameDraft()" (ngModelChange)="networkNameDraft.set($event)"
+                  (keyup.enter)="confirmNetworkName()" maxlength="60" />
 
-                <button
-                  type="button"
-                  class="btn-secondary mt-4"
-                  (click)="detectLocation()"
-                  [disabled]="isLocating()"
-                >
-                  <app-icon name="crosshair" [size]="16"></app-icon>
-                  <span class="ml-2">{{ isLocating() ? 'Detectando...' : 'Detectar ubicación' }}</span>
+                <button type="button" class="btn-primary shrink-0" (click)="confirmNetworkName()"
+                  [disabled]="networkNameDraft().trim().length === 0">
+                  Confirmar
                 </button>
-
-                @if (networkName().trim().length === 0) {
-                  <p class="text-xs text-slate-400 mt-3">
-                    Asigna un nombre para que este análisis se guarde en tu historial.
-                  </p>
-                }
               </div>
+              } @else {
+              <div class="flex items-stretch gap-2">
+                <div class="input flex-1 flex items-center font-semibold text-slate-800">
+                  {{ networkName() }}
+                </div>
 
-              <div class="network-panel__map">
-                <app-network-location-map
-                  [location]="location()"
-                  [editable]="true"
-                  (locationChange)="onLocationChange($event)"
-                ></app-network-location-map>
+                <button type="button" class="btn-secondary shrink-0" (click)="editNetworkName()">
+                  Editar
+                </button>
               </div>
+              }
             </div>
 
-            <!-- STATS CARDS -->
-            <app-stats-cards [liveMetrics]="liveMetrics()"></app-stats-cards>
-
-            <!-- GRÁFICA -->
-            <div class="card mt-6">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
-                  <h2 class="title-section">Traffic Analytics</h2>
-                  <p class="subtitle subtitle--tight">Historial real enviado al backend.</p>
-                </div>
-                <div class="flex gap-2 w-full sm:w-auto">
-                  <button
-                    (click)="setTimeframe('dia')"
-                    [class]="chartTimeframe() === 'dia' ? 'btn-primary flex-1 sm:flex-none' : 'btn-secondary flex-1 sm:flex-none'"
-                  >Día</button>
-                  <button
-                    (click)="setTimeframe('semana')"
-                    [class]="chartTimeframe() === 'semana' ? 'btn-primary flex-1 sm:flex-none' : 'btn-secondary flex-1 sm:flex-none'"
-                  >Sem.</button>
-                </div>
-              </div>
-              <div class="bg-slate-50 rounded-2xl p-4 w-full h-[280px]">
-                <app-charts [history]="history()?.points ?? []"></app-charts>
-              </div>
+            <div class="network-panel__location">
+              <app-icon name="map-pin" [size]="18" class="text-blue-600 shrink-0"></app-icon>
+              <span class="text-sm text-slate-600">
+                {{ location()?.address ?? (isLocating() ? 'Detectando ubicación...' : 'Ubicación no detectada') }}
+              </span>
             </div>
 
-            <!-- MÉTRICAS + RESUMEN -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+            <button type="button" class="btn-secondary mt-4" (click)="detectLocation()" [disabled]="isLocating()">
+              <app-icon name="crosshair" [size]="16"></app-icon>
+              <span class="ml-2">{{ isLocating() ? 'Detectando...' : 'Detectar ubicación' }}</span>
+            </button>
 
-              <!-- TABLA MÉTRICAS -->
-              <div class="col-span-1 lg:col-span-7">
-                <div class="card card--flush h-full">
-                  <div class="flex justify-between items-center gap-4 mb-6">
-                    <div>
-                      <h2 class="title-section">Métricas de Rendimiento</h2>
-                      <p class="text-slate-500 text-sm">Última medición recibida desde FastAPI.</p>
-                    </div>
-                    <button
-                      (click)="refreshData()"
-                      class="btn-secondary btn-icon-only"
-                      [disabled]="isRunningTest()"
-                      aria-label="Actualizar métricas"
-                    ><app-icon name="refresh-cw" [size]="18"></app-icon></button>
-                  </div>
-
-                  @if (liveMetrics(); as metrics) {
-                    <div class="table-container">
-                      <div class="table-header">
-                        <div>Métrica</div>
-                        <div>Valor</div>
-                        <div>Estado</div>
-                        <div>Fuente</div>
-                      </div>
-                      <div class="table-row">
-                        <div class="font-semibold text-slate-700">Latencia</div>
-                        <div class="font-bold text-slate-900">{{ metrics.latency_ms | number:'1.2-2' }} ms</div>
-                        <div [class]="getStatusTextClass(getLatencyStatus())">{{ getLatencyStatus() }}</div>
-                        <div class="text-slate-400 text-xs">Angular + FastAPI</div>
-                      </div>
-                      <div class="table-row">
-                        <div class="font-semibold text-slate-700">Packet Loss</div>
-                        <div class="font-bold text-slate-900">{{ metrics.packet_loss_pct | number:'1.2-2' }}%</div>
-                        <div [class]="getStatusTextClass(getPacketLossStatus())">{{ getPacketLossStatus() }}</div>
-                        <div class="text-slate-400 text-xs">Fallos HTTP</div>
-                      </div>
-                      <div class="table-row">
-                        <div class="font-semibold text-slate-700">Throughput</div>
-                        <div class="font-bold text-slate-900">{{ metrics.download_mbps | number:'1.2-2' }} Mbps</div>
-                        <div class="text-blue-600 font-bold">Medido</div>
-                        <div class="text-slate-400 text-xs">Descarga probe</div>
-                      </div>
-                      <div class="table-row">
-                        <div class="font-semibold text-slate-700">Jitter</div>
-                        <div class="font-bold text-slate-900">{{ metrics.jitter_ms | number:'1.2-2' }} ms</div>
-                        <div [class]="getStatusTextClass(getJitterStatus())">{{ getJitterStatus() }}</div>
-                        <div class="text-slate-400 text-xs">Variación latencia</div>
-                      </div>
-                    </div>
-                  } @else {
-                    <div class="text-center py-12 text-slate-400">
-                      No hay métricas. Presiona "Medir red ahora".
-                    </div>
-                  }
-                </div>
-              </div>
-
-              <!-- RESUMEN -->
-              <div class="col-span-1 lg:col-span-5">
-                <div class="card card--flush h-full">
-                  <h2 class="title-section mb-5">Resumen General</h2>
-                  <div class="flex flex-col gap-4">
-                    <div class="mini-card mini-card--flush flex justify-between items-center">
-                      <div>
-                        <p class="text-slate-500 text-xs mb-1">Disponibilidad estimada</p>
-                        <p class="text-3xl font-black text-slate-900">{{ getAvailability() }}%</p>
-                      </div>
-                      <app-icon name="globe" [size]="32" class="text-blue-500"></app-icon>
-                    </div>
-                    <div class="mini-card mini-card--flush flex justify-between items-center">
-                      <div>
-                        <p class="text-slate-500 text-xs mb-1">Probabilidad de congestión</p>
-                        <p class="text-3xl font-black text-slate-900">{{ queueMetrics()?.congestion_probability_pct ?? 0 | number:'1.2-2' }}%</p>
-                      </div>
-                      <app-icon name="bar-chart" [size]="32" class="text-blue-500"></app-icon>
-                    </div>
-                    <div class="mini-card mini-card--flush flex justify-between items-center">
-                      <div>
-                        <p class="text-slate-500 text-xs mb-1">Última actualización</p>
-                        <p class="text-base font-black text-slate-900">
-                          {{ liveMetrics()?.last_updated ? (liveMetrics()?.last_updated | date:'short') : 'Sin datos' }}
-                        </p>
-                      </div>
-                      <app-icon name="clock" [size]="32" class="text-blue-500"></app-icon>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- SIMULADOR + AI -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <app-network-simulator [queueMetrics]="queueMetrics()"></app-network-simulator>
-              <app-ai-recommendations
-                [recommendationResponse]="recommendations()"
-                [isLoading]="isLoadingRecommendations()"
-                (refreshRecommendations)="refreshRecommendations()"
-              ></app-ai-recommendations>
-            </div>
-
-          </div>
-        }
-
-        <!-- TAB: ESTADÍSTICAS -->
-        @case ('estadisticas') {
-          <div [@tabAnimation] class="card">
-            <h2 class="title-section mb-6">Estadísticas de la sesión</h2>
-
-            @if (statistics(); as stats) {
-              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
-                <div class="mini-card mini-card--flush">
-                  <p class="text-slate-500 text-sm mb-2">Latencia promedio</p>
-                  <p class="text-2xl font-black text-slate-900">{{ stats.latency_stats.mean | number:'1.2-2' }} ms</p>
-                  <p class="text-xs text-slate-400 mt-1">σ = {{ stats.latency_stats.std_dev | number:'1.2-2' }}</p>
-                </div>
-                <div class="mini-card mini-card--flush">
-                  <p class="text-slate-500 text-sm mb-2">Jitter promedio</p>
-                  <p class="text-2xl font-black text-slate-900">{{ stats.jitter_stats.mean | number:'1.2-2' }} ms</p>
-                  <p class="text-xs text-slate-400 mt-1">σ = {{ stats.jitter_stats.std_dev | number:'1.2-2' }}</p>
-                </div>
-                <div class="mini-card mini-card--flush">
-                  <p class="text-slate-500 text-sm mb-2">Throughput promedio</p>
-                  <p class="text-2xl font-black text-slate-900">{{ stats.download_stats.mean | number:'1.2-2' }} Mbps</p>
-                  <p class="text-xs text-slate-400 mt-1">Mediana = {{ stats.download_stats.median | number:'1.2-2' }}</p>
-                </div>
-                <div class="mini-card mini-card--flush">
-                  <p class="text-slate-500 text-sm mb-2">λ (tasa de llegada)</p>
-                  <p class="text-2xl font-black text-slate-900">{{ stats.lambda_rate | number:'1.2-2' }}</p>
-                  <p class="text-xs text-slate-400 mt-1">solicitudes/s</p>
-                </div>
-              </div>
-
-              <div class="p-5 rounded-2xl bg-blue-50 text-slate-700">
-                <p class="font-bold mb-2 text-sm">Análisis:</p>
-                <p class="text-sm leading-relaxed">{{ stats.analysis_message }}</p>
-                <p class="mt-3 text-sm">
-                  Tendencia del tráfico: <strong>{{ stats.traffic_trend }}</strong>
-                </p>
-              </div>
-            } @else {
-              <p class="text-slate-400 py-8 text-center">
-                Aún no hay suficientes mediciones para mostrar estadísticas.
-              </p>
+            @if (networkName().trim().length === 0) {
+            <p class="text-xs text-slate-400 mt-3">
+              Asigna un nombre para que este análisis se guarde en tu historial.
+            </p>
             }
           </div>
-        }
 
-        <!-- TAB: REPORTES -->
-        @case ('reportes') {
-          <div [@tabAnimation] class="card">
-            <h2 class="title-section mb-2">Reportes</h2>
-            <p class="subtitle mb-6">Exporta el historial de mediciones de esta sesión en formato CSV.</p>
-            <button (click)="exportData()" class="btn-primary">
-              Descargar CSV
-            </button>
+          <div class="network-panel__map">
+            <app-network-location-map [location]="location()" [editable]="true"
+              (locationChange)="onLocationChange($event)"></app-network-location-map>
           </div>
+        </div>
+
+        <!-- STATS CARDS -->
+        <app-stats-cards [liveMetrics]="liveMetrics()"></app-stats-cards>
+
+        <!-- GRÁFICA -->
+        <div class="card mt-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h2 class="title-section">Traffic Analytics</h2>
+              <p class="subtitle subtitle--tight">Historial real enviado al backend.</p>
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto">
+              <button (click)="setTimeframe('dia')"
+                [class]="chartTimeframe() === 'dia' ? 'btn-primary flex-1 sm:flex-none' : 'btn-secondary flex-1 sm:flex-none'">Día</button>
+              <button (click)="setTimeframe('semana')"
+                [class]="chartTimeframe() === 'semana' ? 'btn-primary flex-1 sm:flex-none' : 'btn-secondary flex-1 sm:flex-none'">Sem.</button>
+            </div>
+          </div>
+          <div class="bg-slate-50 rounded-2xl p-4 w-full h-[280px]">
+            <app-charts [history]="history()?.points ?? []"></app-charts>
+          </div>
+        </div>
+
+        <!-- MÉTRICAS + RESUMEN -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+
+          <!-- TABLA MÉTRICAS -->
+          <div class="col-span-1 lg:col-span-7">
+            <div class="card card--flush h-full">
+              <div class="flex justify-between items-center gap-4 mb-6">
+                <div>
+                  <h2 class="title-section">Métricas de Rendimiento</h2>
+                  <p class="text-slate-500 text-sm">Última medición recibida desde FastAPI.</p>
+                </div>
+                <button (click)="refreshData()" class="btn-secondary btn-icon-only" [disabled]="isRunningTest()"
+                  aria-label="Actualizar métricas"><app-icon name="refresh-cw" [size]="18"></app-icon></button>
+              </div>
+
+              @if (liveMetrics(); as metrics) {
+              <div class="table-container">
+                <div class="table-header">
+                  <div>Métrica</div>
+                  <div>Valor</div>
+                  <div>Estado</div>
+                  <div>Fuente</div>
+                </div>
+                <div class="table-row">
+                  <div class="font-semibold text-slate-700">Latencia</div>
+                  <div class="font-bold text-slate-900">{{ metrics.latency_ms | number:'1.2-2' }} ms</div>
+                  <div [class]="getStatusTextClass(getLatencyStatus())">{{ getLatencyStatus() }}</div>
+                  <div class="text-slate-400 text-xs">Angular + FastAPI</div>
+                </div>
+                <div class="table-row">
+                  <div class="font-semibold text-slate-700">Packet Loss</div>
+                  <div class="font-bold text-slate-900">{{ metrics.packet_loss_pct | number:'1.2-2' }}%</div>
+                  <div [class]="getStatusTextClass(getPacketLossStatus())">{{ getPacketLossStatus() }}</div>
+                  <div class="text-slate-400 text-xs">Fallos HTTP</div>
+                </div>
+                <div class="table-row">
+                  <div class="font-semibold text-slate-700">Throughput</div>
+                  <div class="font-bold text-slate-900">{{ metrics.download_mbps | number:'1.2-2' }} Mbps</div>
+                  <div class="text-blue-600 font-bold">Medido</div>
+                  <div class="text-slate-400 text-xs">Descarga probe</div>
+                </div>
+                <div class="table-row">
+                  <div class="font-semibold text-slate-700">Jitter</div>
+                  <div class="font-bold text-slate-900">{{ metrics.jitter_ms | number:'1.2-2' }} ms</div>
+                  <div [class]="getStatusTextClass(getJitterStatus())">{{ getJitterStatus() }}</div>
+                  <div class="text-slate-400 text-xs">Variación latencia</div>
+                </div>
+              </div>
+              } @else {
+              <div class="text-center py-12 text-slate-400">
+                No hay métricas. Presiona "Medir red ahora".
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- RESUMEN -->
+          <div class="col-span-1 lg:col-span-5">
+            <div class="card card--flush h-full">
+              <h2 class="title-section mb-5">Resumen General</h2>
+              <div class="flex flex-col gap-4">
+                <div class="mini-card mini-card--flush flex justify-between items-center">
+                  <div>
+                    <p class="text-slate-500 text-xs mb-1">Disponibilidad estimada</p>
+                    <p class="text-3xl font-black text-slate-900">{{ getAvailability() }}%</p>
+                  </div>
+                  <app-icon name="globe" [size]="32" class="text-blue-500"></app-icon>
+                </div>
+                <div class="mini-card mini-card--flush flex justify-between items-center">
+                  <div>
+                    <p class="text-slate-500 text-xs mb-1">Probabilidad de congestión</p>
+                    <p class="text-3xl font-black text-slate-900">{{ queueMetrics()?.congestion_probability_pct ?? 0 |
+                      number:'1.2-2' }}%</p>
+                  </div>
+                  <app-icon name="bar-chart" [size]="32" class="text-blue-500"></app-icon>
+                </div>
+                <div class="mini-card mini-card--flush flex justify-between items-center">
+                  <div>
+                    <p class="text-slate-500 text-xs mb-1">Última actualización</p>
+                    <p class="text-base font-black text-slate-900">
+                      {{ liveMetrics()?.last_updated ? (liveMetrics()?.last_updated | date:'short') : 'Sin datos' }}
+                    </p>
+                  </div>
+                  <app-icon name="clock" [size]="32" class="text-blue-500"></app-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIMULADOR + AI -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <app-network-simulator [queueMetrics]="queueMetrics()"></app-network-simulator>
+          <app-ai-recommendations [recommendationResponse]="recommendations()" [isLoading]="isLoadingRecommendations()"
+            (refreshRecommendations)="refreshRecommendations()"></app-ai-recommendations>
+        </div>
+
+      </div>
+      }
+
+      <!-- TAB: ESTADÍSTICAS -->
+      @case ('estadisticas') {
+      <div [@tabAnimation] class="card">
+        <h2 class="title-section mb-6">Estadísticas de la sesión</h2>
+
+        @if (statistics(); as stats) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
+          <div class="mini-card mini-card--flush">
+            <p class="text-slate-500 text-sm mb-2">Latencia promedio</p>
+            <p class="text-2xl font-black text-slate-900">{{ stats.latency_stats.mean | number:'1.2-2' }} ms</p>
+            <p class="text-xs text-slate-400 mt-1">σ = {{ stats.latency_stats.std_dev | number:'1.2-2' }}</p>
+          </div>
+          <div class="mini-card mini-card--flush">
+            <p class="text-slate-500 text-sm mb-2">Jitter promedio</p>
+            <p class="text-2xl font-black text-slate-900">{{ stats.jitter_stats.mean | number:'1.2-2' }} ms</p>
+            <p class="text-xs text-slate-400 mt-1">σ = {{ stats.jitter_stats.std_dev | number:'1.2-2' }}</p>
+          </div>
+          <div class="mini-card mini-card--flush">
+            <p class="text-slate-500 text-sm mb-2">Throughput promedio</p>
+            <p class="text-2xl font-black text-slate-900">{{ stats.download_stats.mean | number:'1.2-2' }} Mbps</p>
+            <p class="text-xs text-slate-400 mt-1">Mediana = {{ stats.download_stats.median | number:'1.2-2' }}</p>
+          </div>
+          <div class="mini-card mini-card--flush">
+            <p class="text-slate-500 text-sm mb-2">λ (tasa de llegada)</p>
+            <p class="text-2xl font-black text-slate-900">{{ stats.lambda_rate | number:'1.2-2' }}</p>
+            <p class="text-xs text-slate-400 mt-1">solicitudes/s</p>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-blue-50 text-slate-700">
+          <p class="font-bold mb-2 text-sm">Análisis:</p>
+          <p class="text-sm leading-relaxed">{{ stats.analysis_message }}</p>
+          <p class="mt-3 text-sm">
+            Tendencia del tráfico: <strong>{{ stats.traffic_trend }}</strong>
+          </p>
+        </div>
+        } @else {
+        <p class="text-slate-400 py-8 text-center">
+          Aún no hay suficientes mediciones para mostrar estadísticas.
+        </p>
         }
+      </div>
+      }
+
+      <!-- TAB: REPORTES -->
+      @case ('reportes') {
+      <div [@tabAnimation] class="card">
+        <h2 class="title-section mb-2">Reportes</h2>
+        <p class="subtitle mb-6">Exporta el historial de mediciones de esta sesión en formato CSV.</p>
+        <button (click)="exportData()" class="btn-primary">
+          Descargar CSV
+        </button>
+      </div>
+      }
       }
 
     </div>
