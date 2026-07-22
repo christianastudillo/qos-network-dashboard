@@ -302,4 +302,22 @@ export class NetworkMeasurementService {
       'unknown'
     );
   }
+
+  startNewSession(): string {
+    const newSessionId = crypto.randomUUID();
+
+    localStorage.setItem(
+      this.sessionStorageKey,
+      newSessionId
+    );
+
+    return newSessionId;
+  }
+
+  setSessionId(sessionId: string): void {
+    localStorage.setItem(
+      this.sessionStorageKey,
+      sessionId
+    );
+  }
 }

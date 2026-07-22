@@ -29,6 +29,7 @@ export class NetworkApiService {
   constructor(
     private readonly http: HttpClient
   ) {}
+  constructor(private readonly http: HttpClient) { }
 
   ping(): Observable<{
     status: string;
@@ -138,6 +139,7 @@ export class NetworkApiService {
 
   getNetworkProfiles():
     Observable<NetworkProfilesListResponse> {
+  getNetworkProfiles(): Observable<NetworkProfilesListResponse> {
     return this.http.get<NetworkProfilesListResponse>(
       `${this.apiUrl}/network-profiles`
     );
