@@ -110,6 +110,12 @@
               <p class="network-change-message">
                 Se cambió de red. Ingresa el nombre de la nueva red.
               </p>
+
+              @if (networkName().trim().length > 0) {
+              <button type="button" class="btn-secondary network-name-keep" (click)="keepSameNetwork()">
+                Sigo en "{{ networkName() }}"
+              </button>
+              }
               }
 
               @if (isEditingNetworkName()) {

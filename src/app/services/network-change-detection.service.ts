@@ -45,6 +45,7 @@ export class NetworkChangeDetectionService {
 
   private readonly startupDelayMs = 2500;
   private readonly notificationCooldownMs = 4000;
+  private readonly changeConfirmationDelayMs = 20000;
 
   private readonly connectionChangeHandler = (): void => {
     this.handleConnectionChange();
@@ -133,20 +134,46 @@ export class NetworkChangeDetectionService {
   }
 
   private handleConnectionChange(): void {
-    const nextFingerprint = this.buildFingerprint();
+    const candidateFingerprint =
+      this.buildFingerprint();
 
-    const fingerprintChanged =
-      nextFingerprint !== this.lastFingerprint;
-
-    this.lastFingerprint = nextFingerprint;
-
-    if (!fingerprintChanged) {
+    if (
+      candidateFingerprint ===
+      this.lastFingerprint
+    ) {
       return;
     }
 
-    this.emitNetworkChange(
-      'connection-properties'
-    );
+    const previousStableFingerprint =
+      this.lastFingerprint;
+
+    /*
+     * No se marca el cambio de inmediato.
+     *
+     * Muchas fluctuaciones de señal (4g -> 3g -> 4g)
+     * generan el mismo evento sin que el usuario haya
+     * cambiado realmente de red. Se espera un momento
+     * y se vuelve a comprobar: si el fingerprint volvió
+     * al valor anterior, se descarta como falso positivo.
+     */
+    setTimeout(() => {
+      const confirmedFingerprint =
+        this.buildFingerprint();
+
+      if (
+        confirmedFingerprint ===
+        previousStableFingerprint
+      ) {
+        return;
+      }
+
+      this.lastFingerprint =
+        confirmedFingerprint;
+
+      this.emitNetworkChange(
+        'connection-properties'
+      );
+    }, this.changeConfirmationDelayMs);
   }
 
   private handleOffline(): void {
@@ -170,19 +197,14 @@ export class NetworkChangeDetectionService {
   ): void {
     const now = Date.now();
 
-    if (
-      now - this.startedAt <
-      this.startupDelayMs
-    ) {
-      return;
-    }
+if (now - this.startedAt < this.startupDelayMs) {
+  return;
+}
 
-    if (
-      now - this.lastEmissionAt <
-      this.notificationCooldownMs
-    ) {
-      return;
-    }
+if (now - this.lastEmissionAt < this.notificationCooldownMs) {
+  return;
+}
+
 
     this.lastEmissionAt = now;
 

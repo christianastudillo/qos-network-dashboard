@@ -9,10 +9,6 @@ import {
   signal
 } from '@angular/core';
 
-import {
-  HttpErrorResponse
-} from '@angular/common/http';
-
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -156,11 +152,8 @@ type Timeframe =
 export class DashboardComponent
   implements OnInit, OnDestroy {
 
-  isSavingNetworkName = signal(false);
-
-  activeTab = signal<DashboardTab>('dashboard');
-  chartTimeframe = signal<Timeframe>('dia');
-  sessionId = signal<string>('');
+  private readonly networkNameStorageKey =
+    'qos_network_name';
 
   private readonly initialNetworkName =
     this.getStoredNetworkName();
@@ -304,11 +297,14 @@ export class DashboardComponent
 
     void this.loadNetworkNameFromBackend();
 
-    this.dataStreamSubscription = timer(0, 15000).subscribe(() => {
-      this.runNetworkTestAndRefresh(false);
-    });
-
     this.networkChangeDetectionService.start();
+
+    this.networkChangeSubscription =
+      this.networkChangeDetectionService
+        .networkChanged$
+        .subscribe(() => {
+          this.handleDetectedNetworkChange();
+        });
 
     this.dataStreamSubscription =
       timer(0, 15000).subscribe(() => {
@@ -407,7 +403,7 @@ export class DashboardComponent
     const targetSessionId =
       mustStartNewSession
         ? this.networkMeasurementService
-            .createSessionId()
+          .createSessionId()
         : this.sessionId();
 
     if (!targetSessionId) {
@@ -485,6 +481,32 @@ export class DashboardComponent
         false
       );
     }
+  }
+
+  keepSameNetwork(): void {
+    const currentName =
+      this.networkName().trim();
+
+    if (!currentName) {
+      return;
+    }
+
+    this.networkChangePending.set(
+      false
+    );
+
+    this.networkNameDraft.set(
+      currentName
+    );
+
+    this.isEditingNetworkName.set(
+      false
+    );
+
+    this.showToast(
+      `Seguimos midiendo "${currentName}".`,
+      'success'
+    );
   }
 
   editNetworkName(): void {
@@ -605,41 +627,41 @@ export class DashboardComponent
 
     const record:
       Omit<AnalysisRecord, 'id'> = {
-        uid,
-        networkName: name,
-        location: this.location(),
-        sessionId: this.sessionId(),
+      uid,
+      networkName: name,
+      location: this.location(),
+      sessionId: this.sessionId(),
 
-        createdAt:
-          new Date().toISOString(),
+      createdAt:
+        new Date().toISOString(),
 
-        liveMetrics: metrics,
+      liveMetrics: metrics,
 
-        statistics: stats
-          ? {
-              latency_mean:
-                stats.latency_stats.mean,
+      statistics: stats
+        ? {
+          latency_mean:
+            stats.latency_stats.mean,
 
-              latency_std_dev:
-                stats.latency_stats.std_dev,
+          latency_std_dev:
+            stats.latency_stats.std_dev,
 
-              jitter_mean:
-                stats.jitter_stats.mean,
+          jitter_mean:
+            stats.jitter_stats.mean,
 
-              download_mean:
-                stats.download_stats.mean,
+          download_mean:
+            stats.download_stats.mean,
 
-              lambda_rate:
-                stats.lambda_rate,
+          lambda_rate:
+            stats.lambda_rate,
 
-              traffic_trend:
-                stats.traffic_trend
-            }
-          : null,
+          traffic_trend:
+            stats.traffic_trend
+        }
+        : null,
 
-        queue,
-        recommendations
-      };
+      queue,
+      recommendations
+    };
 
     try {
       await this.analysisHistoryService
@@ -1039,125 +1061,6 @@ export class DashboardComponent
     return id
       ? id.slice(0, 8)
       : 'N/A';
-    return id ? id.slice(0, 8) : 'N/A';
   }
 
-  async confirmNetworkName(): Promise<void> {
-    const newName = this.networkNameDraft().trim();
-
-    if (!newName) {
-      this.showToast(
-        'Debes ingresar un nombre para la red.',
-        'error'
-      );
-      return;
-    }
-
-    const previousName = this.networkName().trim();
-
-    const networkChanged =
-      previousName.length > 0 &&
-      previousName !== newName;
-
-    const targetSessionId = networkChanged
-      ? crypto.randomUUID()
-      : this.sessionId();
-
-    if (!targetSessionId) {
-      this.showToast(
-        'No existe una sesión válida.',
-        'error'
-      );
-      return;
-    }
-
-    this.isSavingNetworkName.set(true);
-
-    try {
-      const savedProfile = await firstValueFrom(
-        this.networkApiService.confirmNetworkProfile(
-          targetSessionId,
-          {
-            name: newName,
-            network_type: null
-          }
-        )
-      );
-
-      if (networkChanged) {
-        this.networkMeasurementService.setSessionId(
-          targetSessionId
-        );
-
-        this.sessionId.set(targetSessionId);
-        this.clearCurrentAnalysis();
-      }
-
-      this.networkName.set(savedProfile.name);
-      this.networkNameDraft.set(savedProfile.name);
-      this.isEditingNetworkName.set(false);
-
-      this.showToast(
-        networkChanged
-          ? `Red actualizada a "${savedProfile.name}". Se inició una nueva sesión.`
-          : `Red "${savedProfile.name}" guardada.`,
-        'success'
-      );
-    } catch (error) {
-      console.error(error);
-
-      this.showToast(
-        'No se pudo guardar el nombre de la red.',
-        'error'
-      );
-    } finally {
-      this.isSavingNetworkName.set(false);
-    }
-  }
-
-  editNetworkName(): void {
-    this.networkNameDraft.set(this.networkName());
-    this.isEditingNetworkName.set(true);
-  }
-
-  private clearCurrentAnalysis(): void {
-    this.liveMetrics.set(null);
-    this.history.set(null);
-    this.statistics.set(null);
-    this.queueMetrics.set(null);
-    this.recommendations.set(null);
-  }
-
-  private async loadNetworkNameFromBackend(): Promise<void> {
-    const currentSessionId = this.sessionId();
-
-    if (!currentSessionId) {
-      return;
-    }
-
-    try {
-      const profile = await firstValueFrom(
-        this.networkApiService.getNetworkProfileForSession(
-          currentSessionId
-        )
-      );
-
-      this.networkName.set(profile.name);
-      this.networkNameDraft.set(profile.name);
-      this.isEditingNetworkName.set(false);
-    } catch (error) {
-      if (
-        error instanceof HttpErrorResponse &&
-        error.status === 404
-      ) {
-        // Es una sesión nueva y todavía no tiene una red asociada.
-        return;
-      }
-
-      console.error(
-        'No se pudo recuperar la red guardada:',
-        error
-      );
-    }
-  }
 }
