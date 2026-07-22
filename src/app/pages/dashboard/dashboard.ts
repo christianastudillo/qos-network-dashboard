@@ -96,9 +96,9 @@ import {
 import {
   AnalysisRecord
 } from '../../models/analysis-record.model';
-
+//cada cuanto se guarda en la base de datos el registro de analisis
 const AUTOSAVE_INTERVAL_MS =
-  5 * 60 * 1000;
+  2 * 60 * 1000;
 
 type DashboardTab =
   | 'dashboard'
