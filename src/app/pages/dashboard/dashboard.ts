@@ -494,7 +494,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return id ? id.slice(0, 8) : 'N/A';
   }
 
-  confirmNetworkName(): void {
+  async confirmNetworkName(): Promise<void> {
     const newName = this.networkNameDraft().trim();
 
     if (!newName) {
@@ -506,28 +506,65 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     const previousName = this.networkName().trim();
+
     const networkChanged =
       previousName.length > 0 &&
       previousName !== newName;
 
-    if (networkChanged) {
-      const newSessionId =
-        this.networkMeasurementService.startNewSession();
+    const targetSessionId = networkChanged
+      ? crypto.randomUUID()
+      : this.sessionId();
 
-      this.sessionId.set(newSessionId);
-      this.clearCurrentAnalysis();
+    if (!targetSessionId) {
+      this.showToast(
+        'No existe una sesión válida.',
+        'error'
+      );
+      return;
     }
 
-    this.networkName.set(newName);
-    this.networkNameDraft.set(newName);
-    this.isEditingNetworkName.set(false);
+    this.isSavingNetworkName.set(true);
 
-    this.showToast(
-      networkChanged
-        ? `Red actualizada a "${newName}". Se inició una nueva sesión.`
-        : `Red "${newName}" confirmada.`,
-      'success'
-    );
+    try {
+      const savedProfile = await firstValueFrom(
+        this.networkApiService.confirmNetworkProfile(
+          targetSessionId,
+          {
+            name: newName,
+            network_type: null
+          }
+        )
+      );
+
+      if (networkChanged) {
+        this.networkMeasurementService.setSessionId(
+          targetSessionId
+        );
+
+        this.sessionId.set(targetSessionId);
+        this.clearCurrentAnalysis();
+      }
+
+      this.networkName.set(savedProfile.name);
+      this.networkNameDraft.set(savedProfile.name);
+      this.isEditingNetworkName.set(false);
+
+      this.showToast(
+        networkChanged
+          ? `Red actualizada a "${savedProfile.name}". Se inició una nueva sesión.`
+          : `Red "${savedProfile.name}" guardada.`,
+        'success'
+      );
+    } catch (error) {
+      console.error(error);
+
+      this.showToast(
+        'No se pudo guardar el nombre de la red.',
+        'error'
+      );
+    } finally {
+      this.isSavingNetworkName.set(false);
+    }
   }
 
   editNetworkName(): void {
