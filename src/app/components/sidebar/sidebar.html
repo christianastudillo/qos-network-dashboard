@@ -1,17 +1,8 @@
 <!-- Overlay para cerrar el sidebar en móvil -->
-<div
-  class="sidebar-overlay"
-  [class.active]="sidebarOpen"
-  (click)="closeSidebar()"
-></div>
+<div class="sidebar-overlay" [class.active]="sidebarOpen" (click)="closeSidebar()"></div>
 
 <!-- Botón para abrir el sidebar en móvil -->
-<button
-  class="sidebar-fab"
-  (click)="toggleSidebar()"
-  [class.hidden-fab]="sidebarOpen"
-  aria-label="Abrir menú"
->
+<button class="sidebar-fab" (click)="toggleSidebar()" [class.hidden-fab]="sidebarOpen" aria-label="Abrir menú">
   <app-icon name="menu" [size]="20"></app-icon>
 </button>
 
@@ -36,23 +27,13 @@
   <nav class="sidebar-nav">
 
     @for (item of tabItems; track item.tab) {
-      <button
-        type="button"
-        class="sidebar-nav__item"
-        [class.active]="activeTab === item.tab"
-        (click)="selectTab(item.tab)"
-      >
+      <a routerLink="/dashboard" class="sidebar-nav__item" [class.active]="activeTab === item.tab" (click)="selectTab(item.tab)">
         <app-icon [name]="item.icon" [size]="18" class="sidebar-nav__icon"></app-icon>
         <span>{{ item.label }}</span>
-      </button>
+      </a>
     }
 
-    <a
-      routerLink="/historial"
-      routerLinkActive="active"
-      class="sidebar-nav__item"
-      (click)="closeSidebar()"
-    >
+    <a routerLink="/historial" routerLinkActive="active" class="sidebar-nav__item" (click)="closeSidebar()">
       <app-icon name="archive" [size]="18" class="sidebar-nav__icon"></app-icon>
       <span>Historial</span>
     </a>
