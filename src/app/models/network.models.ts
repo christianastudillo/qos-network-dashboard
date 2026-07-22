@@ -116,3 +116,34 @@ export interface RecommendationResponse {
   generated_by: string;
   generated_at: string;
 }
+
+export interface NetworkProfilePayload {
+  name: string;
+  network_type: string | null;
+}
+
+export interface NetworkProfileSessionResponse {
+  id: number;
+  name: string;
+  network_type: string | null;
+  session_id: string;
+  created_at: string;
+  updated_at: string;
+  session_started_at: string;
+  session_updated_at: string;
+}
+
+export interface NetworkProfileListItem {
+  id: number;
+  name: string;
+  network_type: string | null;
+  session_count: number;
+  last_used_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NetworkProfilesListResponse {
+  items: NetworkProfileListItem[];
+  total: number;
+}

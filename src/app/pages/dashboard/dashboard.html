@@ -111,8 +111,12 @@
                   (keyup.enter)="confirmNetworkName()" maxlength="60" />
 
                 <button type="button" class="btn-primary shrink-0" (click)="confirmNetworkName()"
-                  [disabled]="networkNameDraft().trim().length === 0">
-                  Confirmar
+                  [disabled]="networkNameDraft().trim().length === 0 ||isSavingNetworkName()">
+                  {{
+                  isSavingNetworkName()
+                  ? 'Guardando...'
+                  : 'Confirmar'
+                  }}
                 </button>
               </div>
               } @else {

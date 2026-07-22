@@ -10,7 +10,10 @@ import {
   MetricsHistoryResponse,
   StatisticsResponse,
   QueueRealtimeResponse,
-  RecommendationResponse
+  RecommendationResponse,
+  NetworkProfilePayload,
+  NetworkProfileSessionResponse,
+  NetworkProfilesListResponse
 } from '../models/network.models';
 
 @Injectable({
@@ -19,7 +22,7 @@ import {
 export class NetworkApiService {
   private readonly apiUrl = environment.apiUrl;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient) { }
 
   ping(): Observable<{ status: string; message: string; server_timestamp: string }> {
     return this.http.get<{ status: string; message: string; server_timestamp: string }>(
@@ -73,6 +76,30 @@ export class NetworkApiService {
   clearMeasurements(sessionId: string): Observable<{ status: string; session_id: string }> {
     return this.http.delete<{ status: string; session_id: string }>(
       `${this.apiUrl}/measurements/${sessionId}`
+    );
+  }
+
+  confirmNetworkProfile(
+    sessionId: string,
+    payload: NetworkProfilePayload
+  ): Observable<NetworkProfileSessionResponse> {
+    return this.http.put<NetworkProfileSessionResponse>(
+      `${this.apiUrl}/network-profiles/session/${sessionId}`,
+      payload
+    );
+  }
+
+  getNetworkProfileForSession(
+    sessionId: string
+  ): Observable<NetworkProfileSessionResponse> {
+    return this.http.get<NetworkProfileSessionResponse>(
+      `${this.apiUrl}/network-profiles/session/${sessionId}`
+    );
+  }
+
+  getNetworkProfiles(): Observable<NetworkProfilesListResponse> {
+    return this.http.get<NetworkProfilesListResponse>(
+      `${this.apiUrl}/network-profiles`
     );
   }
 }

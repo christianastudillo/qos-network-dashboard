@@ -171,4 +171,11 @@ export class NetworkMeasurementService {
 
     return newSessionId;
   }
+
+  setSessionId(sessionId: string): void {
+    localStorage.setItem(
+      this.sessionStorageKey,
+      sessionId
+    );
+  }
 }

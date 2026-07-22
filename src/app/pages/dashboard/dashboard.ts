@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
   OnDestroy,
@@ -74,6 +75,8 @@ type Timeframe = 'dia' | 'semana' | 'mes';
 export class DashboardComponent implements OnInit, OnDestroy {
   private readonly networkNameStorageKey = 'qos_network_name';
 
+  isSavingNetworkName = signal(false);
+
   activeTab = signal<DashboardTab>('dashboard');
   chartTimeframe = signal<Timeframe>('dia');
   sessionId = signal<string>('');
@@ -140,6 +143,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.sessionId.set(this.networkMeasurementService.getSessionId());
+
+    void this.loadNetworkNameFromBackend();
 
     this.dataStreamSubscription = timer(0, 15000).subscribe(() => {
       this.runNetworkTestAndRefresh(false);
@@ -536,5 +541,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.statistics.set(null);
     this.queueMetrics.set(null);
     this.recommendations.set(null);
+  }
+
+  private async loadNetworkNameFromBackend(): Promise<void> {
+    const currentSessionId = this.sessionId();
+
+    if (!currentSessionId) {
+      return;
+    }
+
+    try {
+      const profile = await firstValueFrom(
+        this.networkApiService.getNetworkProfileForSession(
+          currentSessionId
+        )
+      );
+
+      this.networkName.set(profile.name);
+      this.networkNameDraft.set(profile.name);
+      this.isEditingNetworkName.set(false);
+    } catch (error) {
+      if (
+        error instanceof HttpErrorResponse &&
+        error.status === 404
+      ) {
+        // Es una sesión nueva y todavía no tiene una red asociada.
+        return;
+      }
+
+      console.error(
+        'No se pudo recuperar la red guardada:',
+        error
+      );
+    }
   }
 }
